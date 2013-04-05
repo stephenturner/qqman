@@ -105,29 +105,22 @@ qq = function(pvector,ymax=NA,gridlines=T,gridlines.col='gray85',confidence=T,co
 	if (is.character(confidence.col[1]) & !(confidence.col[1] %in% colors())) confidence.col = 'gray76'
 	if (is.character(abline.col[1]) & !(abline.col[1] %in% colors())) abline.col = 'red'
 	
-	names(pt.col) = (pt.col %in% colors() | !is.na(suppressWarnings(as.numeric(pt.col))))
-	if (length(pt.col[names(pt.col)=='FALSE'])>0){
+	if (FALSE %in% (pt.col %in% colors() | !is.na(suppressWarnings(as.numeric(pt.col))) )){
 		pt.col = 'black'; warning("pt.col argument(s) not recognized. Setting to default: 'black'.")
 	}
-	names(pt.col) = NULL
-	
-	names(pt.bg) = (pt.bg %in% colors() | !is.na(suppressWarnings(as.numeric(pt.bg))))
-	if (length(pt.bg[names(pt.bg)=='FALSE'])>0){
+
+	if (FALSE %in% (pt.bg %in% colors() | !is.na(suppressWarnings(as.numeric(pt.bg))) )){
 		pt.bg = 'black'; warning("pt.bg argument(s) not recognized. Setting to default: 'black'.")
 	}
-	names(pt.bg) = NULL
 	
-	names(highlight.col) = (highlight.col %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.col))))
-	if (length(highlight.col[names(highlight.col)=='FALSE'])>0){
+	if (FALSE %in% (highlight.col %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.col))) )){
 		highlight.col = 'blue'; warning("highlight.col argument(s) not recognized. Setting to default: 'blue'.")
 	}
-	names(highlight.col) = NULL
-	
-	names(highlight.bg) = (highlight.bg %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.bg))))
-	if (length(highlight.bg[names(highlight.bg)=='FALSE'])>0){
+
+	if (FALSE %in% (highlight.bg %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.bg))) )){
 		highlight.bg = 'blue'; warning("highlight.bg argument(s) not recognized. Setting to default: 'blue'.")
-	}
-	names(highlight.bg) = NULL
+	}		
+	
 	
 	#########
 	
