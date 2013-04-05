@@ -76,13 +76,14 @@ manhattan <- function(dataframe, colors=c("gray10", "gray50"), ymax="max", limit
 
 
 ## Make a pretty QQ plot of p-values
-qq = function(pvector, ...) {
-	if (!is.numeric(pvector)) stop("D'oh! P value vector is not numeric.")
-	pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
-	o = -log10(sort(pvector,decreasing=F))
-	e = -log10( ppoints(length(pvector) ))
-	plot(e,o,pch=19,cex=1, xlab=expression(Expected~~-log[10](italic(p))), ylab=expression(Observed~~-log[10](italic(p))), xlim=c(0,max(e)), ylim=c(0,max(o)), ...)
-	abline(0,1,col="red")
+qq = function(pvector, ymax=NA, ...) {
+    if (!is.numeric(pvector)) stop("D'oh! P value vector is not numeric.")
+    pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
+    o = -log10(sort(pvector,decreasing=F))
+    e = -log10( ppoints(length(pvector) ))
+    if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o)
+    plot(e,o,pch=19,cex=1, xlab=expression(Expected~~-log[10](italic(p))), ylab=expression(Observed~~-log[10](italic(p))), xlim=c(0,max(e)), ylim=c(0,ymax), ...)
+    abline(0,1,col="red")
 }
 
 
