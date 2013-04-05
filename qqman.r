@@ -20,6 +20,11 @@
 #   P=runif(nchr*nsnps)
 # )
 # annotatesnps <- d$SNP[7550:7750]
+#pvector = d[,4] 
+#names(pvector) = d[,1] #passing pvector to qq() with names allows easy annotation (if indicated)
+#top_snps = c('rs20762','rs13895','rs11846')
+### Basic qq
+#qq(pvector,highlight=top_snps,annotate=top_snps)
 
 # manhattan plot using base graphics
 manhattan <- function(dataframe, colors=c("gray10", "gray50"), ymax="max", limitchromosomes=1:23, suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), annotate=NULL, ...) {
@@ -76,15 +81,124 @@ manhattan <- function(dataframe, colors=c("gray10", "gray50"), ymax="max", limit
 
 
 ## Make a pretty QQ plot of p-values
-qq = function(pvector, ymax=NA, ...) {
-    if (!is.numeric(pvector)) stop("D'oh! P value vector is not numeric.")
-    pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
-    o = -log10(sort(pvector,decreasing=F))
-    e = -log10( ppoints(length(pvector) ))
-    if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o)
-    plot(e,o,pch=19,cex=1, xlab=expression(Expected~~-log[10](italic(p))), ylab=expression(Observed~~-log[10](italic(p))), xlim=c(0,max(e)), ylim=c(0,ymax), ...)
-    abline(0,1,col="red")
+qq = function(pvector,ymax=NA,gridlines=T,gridlines.col='gray85',confidence=T,confidence.col='gray76',
+	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',
+	highlight=NULL,highlight.col='blue',highlight.bg='blue',
+	annotate=NULL,annotate.cex=0.7,annotate.font=3, ...) {
+	#======================================================================================================
+	######## Check data and arguments
+	if (!is.numeric(pvector)) stop("D'oh! P value vector is not numeric.")
+	if (!is.null(highlight)){
+		if (is.null(names(pvector))) stop ("D'oh! P value vector must have names (rs_ids) to use the highlight feature.")
+		if (FALSE %in% (highlight %in% names(pvector))) stop ("D'oh! Highlight vector must be a subset of the names of the P value vector.")
+	}
+	if (!is.null(annotate)){
+		if (is.null(names(pvector))) stop ("D'oh! P value vector must have names (rs_ids) to use the annotate feature.")
+		if (FALSE %in% (annotate %in% names(pvector))) stop ("D'oh! Annotate vector must be a subset of the names of the P value vector.")
+	}	
+	if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o) 
+	if (!is.numeric(pt.cex) | pt.cex<0) pt.cex=0.5
+	if (!is.numeric(annotate.cex) | annotate.cex<0) annotate.cex=0.7
+	if (!is.numeric(annotate.font)) annotate.font=3
+	
+	if (is.character(gridlines.col[1]) & !(gridlines.col[1] %in% colors())) gridlines.col = 'gray85'
+	if (is.character(confidence.col[1]) & !(confidence.col[1] %in% colors())) confidence.col = 'gray76'
+	if (is.character(abline.col[1]) & !(abline.col[1] %in% colors())) abline.col = 'red'
+	
+	names(pt.col) = (pt.col %in% colors() | !is.na(suppressWarnings(as.numeric(pt.col))))
+	if (length(pt.col[names(pt.col)=='FALSE'])>0){
+		pt.col = 'black'; warning("pt.col argument(s) not recognized. Setting to default: 'black'.")
+	}
+	names(pt.col) = NULL
+	
+	names(pt.bg) = (pt.bg %in% colors() | !is.na(suppressWarnings(as.numeric(pt.bg))))
+	if (length(pt.bg[names(pt.bg)=='FALSE'])>0){
+		pt.bg = 'black'; warning("pt.bg argument(s) not recognized. Setting to default: 'black'.")
+	}
+	names(pt.bg) = NULL
+	
+	names(highlight.col) = (highlight.col %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.col))))
+	if (length(highlight.col[names(highlight.col)=='FALSE'])>0){
+		highlight.col = 'blue'; warning("highlight.col argument(s) not recognized. Setting to default: 'blue'.")
+	}
+	names(highlight.col) = NULL
+	
+	names(highlight.bg) = (highlight.bg %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.bg))))
+	if (length(highlight.bg[names(highlight.bg)=='FALSE'])>0){
+		highlight.bg = 'blue'; warning("highlight.bg argument(s) not recognized. Setting to default: 'blue'.")
+	}
+	names(highlight.bg) = NULL
+	
+	#########
+	
+	# Create observed and expected log distributions
+	pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
+	o = -log10(sort(pvector,decreasing=F))
+	e = -log10( ppoints(length(pvector) ))
+	names(e) = names(o)
+	
+	# Initialize plot
+	xspace = 0.078
+	plot(0,xlab=expression(Expected~~-log[10](italic(p))),ylab=expression(Observed~~-log[10](italic(p))),
+			col=F,yaxt='n',xaxt='n',xlim=c(-0.2,max(e)+xspace),ylim=c(-0.2,ymax+0.2),bty='n',xaxs='i',yaxs='i')
+	axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1))
+	axis(side=2,labels=seq(0,ymax,1),at=seq(0,ymax,1),las=1)
+	
+	# Grid lines
+	if (isTRUE(gridlines)){
+		abline(v=seq(0,max(e),1),col=gridlines.col[1],lwd=1.0)
+		abline(h=seq(0,ymax,1),col=gridlines.col[1],lwd=1.0)
+	}
+	
+	# Confidence intervals
+	find_intervals = function(row){
+		i = row[1]
+		len = row[2]
+		return(c(-log10(qbeta(0.95,i,len-i+1)), -log10(qbeta(0.05,i,len-i+1))))
+	}
+	conf_y = apply(cbind( 1:length(e), rep(length(e),length(e))), MARGIN=1, FUN=find_intervals)
+	colnames(conf_y) = names(o)
+	if (isTRUE(confidence)){
+		# Extrapolate to make plotting prettier (doesn't affect intepretation at data points)
+		slopes = c((conf_y[1,1] - conf_y[1,2]) / (e[1] - e[2]), (conf_y[2,1] - conf_y[2,2]) / (e[1] - e[2]))
+		extrap_x = append(e[1]+xspace,e) #extrapolate slightly for plotting purposes only
+		extrap_y = cbind( c(conf_y[1,1] + slopes[1]*xspace, conf_y[2,1] + slopes[2]*xspace), conf_y)
+		
+		polygon(c(extrap_x, rev(extrap_x)), c(extrap_y[1,], rev(extrap_y[2,])),col = confidence.col[1], border = confidence.col[1])	
+	}
+	
+	# Points (with optional highlighting)
+	fills = rep(pt.bg,length(o))
+	borders = rep(pt.col,length(o))
+	names(fills) = names(borders) = names(o)
+	if (!is.null(highlight)){	
+		borders[highlight] = rep(NA,length(highlight))
+		fills[highlight] = rep(NA,length(highlight))
+	}
+	points(e,o,pch=21,cex=pt.cex,col=borders,bg=fills)
+	
+	if (!is.null(highlight)){
+		points(e[highlight],o[highlight],pch=21,cex=pt.cex,col=highlight.col,bg=highlight.bg)
+	}
+	
+	#Abline
+	abline(0,1,col=abline.col,lwd=1.8)
+	
+	# Annotate SNPs
+	if (!is.null(annotate)){
+		x = e[annotate] # x will definitely be the same
+		y = -0.1 + apply(rbind(o[annotate],conf_y[1,annotate]),2,min)
+		text(x,y,labels=annotate,srt=90,cex=annotate.cex,adj=c(1,0.48),font=annotate.font)		
+	}
+	# Box
+	box()
 }
+
+
+
+
+
+
 
 
 ### OLD GGPLOT2 CODE ###
