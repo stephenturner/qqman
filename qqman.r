@@ -81,28 +81,38 @@ manhattan <- function(dataframe, colors=c("gray10", "gray50"), ymax="max", limit
 
 
 ## Make a pretty QQ plot of p-values
-qq = function(pvector,ymax=NA,gridlines=T,gridlines.col='gray85',confidence=T,confidence.col='gray76',
-	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',
-	highlight=NULL,highlight.col='blue',highlight.bg='blue',
+qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confidence.col='gray81',
+	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',ymax=8,ymax.soft=T,
+	highlight=NULL,highlight.col=c('green3','magenta'),highlight.bg=c('green3','magenta'),
 	annotate=NULL,annotate.cex=0.7,annotate.font=3, ...) {
 	#======================================================================================================
-	######## Check data and arguments
-	if (!is.numeric(pvector)) stop("D'oh! P value vector is not numeric.")
-	if (!is.null(highlight)){
-		if (is.null(names(pvector))) stop ("D'oh! P value vector must have names (rs_ids) to use the highlight feature.")
-		if (FALSE %in% (highlight %in% names(pvector))) stop ("D'oh! Highlight vector must be a subset of the names of the P value vector.")
+	######## Check data and arguments; create observed and expected distributions
+	d = dataframe
+    
+    if (!("P" %in% names(d))) stop("Make sure your data frame contains columns P")
+    if (TRUE %in% is.na(suppressWarnings(as.numeric(d$P)))) warning('non-numeric, non-NA entries in P column of dataframe. attempting to remove..')
+	d = d[!is.na(suppressWarnings(as.numeric(d$P))),] # remove non-numeric Ps
+    d = d[d$P>0 & d$P<1,] # only Ps between 0 and 1
+    
+	if (!is.null(highlight) | !is.null(annotate)){
+		if (!("SNP" %in% names(d))) stop("Make sure your data frame contains columns SNP to use annotate or highlight feature.")
+		d = d[na.omit(d$SNP),]
+		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
+		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
 	}
-	if (!is.null(annotate)){
-		if (is.null(names(pvector))) stop ("D'oh! P value vector must have names (rs_ids) to use the annotate feature.")
-		if (FALSE %in% (annotate %in% names(pvector))) stop ("D'oh! Annotate vector must be a subset of the names of the P value vector.")
-	}	
+	
+	d = d[order(d$P,decreasing=F),] # sort
+	o = -log10(d$P)
+    e = -log10( ppoints(length(d$P) ))
+    if (!is.null(highlight) | !is.null(annotate)) names(e) = names(o) = d$SNP
+	
 	if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o) 
 	if (!is.numeric(pt.cex) | pt.cex<0) pt.cex=0.5
 	if (!is.numeric(annotate.cex) | annotate.cex<0) annotate.cex=0.7
 	if (!is.numeric(annotate.font)) annotate.font=3
 	
-	if (is.character(gridlines.col[1]) & !(gridlines.col[1] %in% colors())) gridlines.col = 'gray85'
-	if (is.character(confidence.col[1]) & !(confidence.col[1] %in% colors())) confidence.col = 'gray76'
+	if (is.character(gridlines.col[1]) & !(gridlines.col[1] %in% colors())) gridlines.col = 'gray83'
+	if (is.character(confidence.col[1]) & !(confidence.col[1] %in% colors())) confidence.col = 'gray81'
 	if (is.character(abline.col[1]) & !(abline.col[1] %in% colors())) abline.col = 'red'
 	
 	if (FALSE %in% (pt.col %in% colors() | !is.na(suppressWarnings(as.numeric(pt.col))) )){
@@ -119,48 +129,74 @@ qq = function(pvector,ymax=NA,gridlines=T,gridlines.col='gray85',confidence=T,co
 
 	if (FALSE %in% (highlight.bg %in% colors() | !is.na(suppressWarnings(as.numeric(highlight.bg))) )){
 		highlight.bg = 'blue'; warning("highlight.bg argument(s) not recognized. Setting to default: 'blue'.")
-	}		
+	}
 	
+	# Ymax
+    if(is.na(suppressWarnings(as.numeric(ymax)))){  # not numeric
+    	ymax = ceiling(max(o))
+    	warning('non-numeric ymax argument.')
+    } else if (as.numeric(ymax) < 0){ 			# negative
+    	ymax = ceiling(max(o))
+    	warning('negative ymax argument.')
+    }
+    if (ymax.soft==T){ #if soft, ymax is just the lower limit for ymax
+    	ymax = max(ymax, ceiling(max(o)))
+    } #else, ymax = ymax
+			
 	
-	#########
-	
-	# Create observed and expected log distributions
-	pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
-	o = -log10(sort(pvector,decreasing=F))
-	e = -log10( ppoints(length(pvector) ))
-	names(e) = names(o)
+	################################
 	
 	# Initialize plot
+	print('Setting up plot.')
+	print(ymax)
 	xspace = 0.078
+	xmax = max(e) * 1.019
+    xmin = max(e) * -0.035
+    #ymax = ceiling(ymax * 1.03)
+    ymin = -ymax*0.03
 	plot(0,xlab=expression(Expected~~-log[10](italic(p))),ylab=expression(Observed~~-log[10](italic(p))),
-			col=F,yaxt='n',xaxt='n',xlim=c(-0.2,max(e)+xspace),ylim=c(-0.2,ymax+0.2),bty='n',xaxs='i',yaxs='i')
-	axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1))
-	axis(side=2,labels=seq(0,ymax,1),at=seq(0,ymax,1),las=1)
+			col=F,las=1,xaxt='n',xlim=c(xmin,xmax),ylim=c(ymin,ymax),bty='n',xaxs='i',yaxs='i',cex.axis=0.95)
+	axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1),cex.axis=0.95,lwd=0,lwd.ticks=1)
 	
 	# Grid lines
 	if (isTRUE(gridlines)){
+		yvals = par('yaxp')
+		yticks = seq(yvals[1],yvals[2],yvals[2]/yvals[3])
 		abline(v=seq(0,max(e),1),col=gridlines.col[1],lwd=1.0)
-		abline(h=seq(0,ymax,1),col=gridlines.col[1],lwd=1.0)
+		abline(h=yticks,col=gridlines.col[1],lwd=1.0)
 	}
 	
-	# Confidence intervals
-	find_intervals = function(row){
-		i = row[1]
-		len = row[2]
-		return(c(-log10(qbeta(0.95,i,len-i+1)), -log10(qbeta(0.05,i,len-i+1))))
-	}
-	conf_y = apply(cbind( 1:length(e), rep(length(e),length(e))), MARGIN=1, FUN=find_intervals)
-	colnames(conf_y) = names(o)
+	 #Confidence intervals
+	 find_conf_intervals = function(row){
+	 	i = row[1]
+	 	len = row[2]
+	 	if (i < 10000 | i %% 100 == 0){
+	 		return(c(-log10(qbeta(0.95,i,len-i+1)), -log10(qbeta(0.05,i,len-i+1))))
+	 	} else { # Speed up
+	 		return(c(NA,NA))
+	 	}
+	 }
+
+	 # Find approximate confidence intervals
 	if (isTRUE(confidence)){
+		print('Plotting confidence intervals.')
+		ci = apply(cbind( 1:length(e), rep(length(e),length(e))), MARGIN=1, FUN=find_conf_intervals)
+	 	bks = append(seq(10000,length(e),100),length(e)+1)
+		for (i in 1:(length(bks)-1)){
+	 		ci[1, bks[i]:(bks[i+1]-1)] = ci[1, bks[i]]
+	 		ci[2, bks[i]:(bks[i+1]-1)] = ci[2, bks[i]]
+		}
+		colnames(ci) = names(e)
 		# Extrapolate to make plotting prettier (doesn't affect intepretation at data points)
-		slopes = c((conf_y[1,1] - conf_y[1,2]) / (e[1] - e[2]), (conf_y[2,1] - conf_y[2,2]) / (e[1] - e[2]))
+		slopes = c((ci[1,1] - ci[1,2]) / (e[1] - e[2]), (ci[2,1] - ci[2,2]) / (e[1] - e[2]))
 		extrap_x = append(e[1]+xspace,e) #extrapolate slightly for plotting purposes only
-		extrap_y = cbind( c(conf_y[1,1] + slopes[1]*xspace, conf_y[2,1] + slopes[2]*xspace), conf_y)
+		extrap_y = cbind( c(ci[1,1] + slopes[1]*xspace, ci[2,1] + slopes[2]*xspace), ci)
 		
 		polygon(c(extrap_x, rev(extrap_x)), c(extrap_y[1,], rev(extrap_y[2,])),col = confidence.col[1], border = confidence.col[1])	
 	}
 	
 	# Points (with optional highlighting)
+	print('Plotting data points.')
 	fills = rep(pt.bg,length(o))
 	borders = rep(pt.col,length(o))
 	names(fills) = names(borders) = names(o)
@@ -180,13 +216,12 @@ qq = function(pvector,ymax=NA,gridlines=T,gridlines.col='gray85',confidence=T,co
 	# Annotate SNPs
 	if (!is.null(annotate)){
 		x = e[annotate] # x will definitely be the same
-		y = -0.1 + apply(rbind(o[annotate],conf_y[1,annotate]),2,min)
+		y = -0.1 + apply(rbind(o[annotate],ci[1,annotate]),2,min)
 		text(x,y,labels=annotate,srt=90,cex=annotate.cex,adj=c(1,0.48),font=annotate.font)		
 	}
 	# Box
 	box()
 }
-
 
 
 
