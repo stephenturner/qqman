@@ -24,6 +24,9 @@
 # 	surrounding_snps = list(	as.character(d$SNP[13795:13995]),
 # 							as.character(d$SNP[20662:20862])) 
 
+# 	### Figure out bug 
+# 	d = subset(d,d$CHR!=3)
+
 ### CALL:
 ### manhattan(d,annotate=top_snps,highlight=surrounding_snps)
 ### qq(d,annotate=top_snps,highlight=top_snps)
@@ -84,6 +87,7 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     d$logp = -log10(d$P)
     d$pos=NA
     
+    
     # Ymax
     if(is.na(suppressWarnings(as.numeric(ymax)))){  # not numeric
     	ymax = ceiling(max(-log10(d$P)))
@@ -104,6 +108,15 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     	}
     } #else, ymax = ymax
 	
+	## Fix for the bug where one chromosome is missing. Adds index column #####
+	d$index=NA
+	ind = 0
+	for (i in unique(d$CHR)){
+		ind = ind + 1
+		d[d$CHR==i,]$index = ind
+	}
+	########
+	
     nchr=length(unique(d$CHR))
     if (nchr==1) {
         d$pos=d$BP
@@ -113,12 +126,12 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     } else {
     	ticks = rep(NA,length(unique(d$CHR))+1)
     	ticks[1] = 0
-        for (i in unique(d$CHR)) {
-          	d[d$CHR==i, ]$pos = d[d$CHR==i, ]$BP -d[d$CHR==i,]$BP[1] +1 +ticks[i]
-    		ticks[i+1] = max(d[d$CHR==i,]$pos)
+        for (i in 1:max(d$index)) {
+          	d[d$index==i, ]$pos   =    (d[d$index==i, ]$BP - d[d$index==i,]$BP[1]) +1 +ticks[i]
+    		ticks[i+1] = max(d[d$index==i,]$pos)
+    	}
     	xlabel = 'Chromosome'
     	labs = append(unique(d$CHR),'')
-    	}
 	}
     
     # Initialize plot
@@ -128,14 +141,25 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     ymin = -ymax*0.03
     plot(0,col=F,xaxt='n',bty='n',xaxs='i',yaxs='i',xlim=c(xmin,xmax), ylim=c(ymin,ymax),
     		xlab=xlabel,ylab=expression(-log[10](italic(p))),las=1)
-	if (length(labs) > 10){
-		for (i in 1:length(labs)){
-			if (i %% 2 == 0){
-				labs[i] = ''
-			}
+	
+	# stagger labels
+	blank = rep('',length(labs))
+	lowerlabs = rep('',length(labs))
+	upperlabs = rep('',length(labs))
+	
+	for (i in 1:length(labs)){
+		if (i %% 2 == 0){
+			lowerlabs[i] = labs[i]
+		} else{
+			upperlabs[i] = labs[i]
 		}
 	}
-	axis(1,at=ticks,labels=labs,lwd=0,lwd.ticks=1,cex.axis=0.95)
+	
+	#axis(1,at=ticks,labels=labs,lwd=0,lwd.ticks=1,cex.axis=0.95)
+	axis(1,at=ticks,labels=blank,lwd=0,lwd.ticks=1,cex.axis=0.95)
+	axis(1,at=ticks,labels=upperlabs,lwd=0,lwd.ticks=0,cex.axis=0.95,line=-0.25)
+	axis(1,at=ticks,labels=lowerlabs,lwd=0,lwd.ticks=0,cex.axis=0.95,line=0.25)
+	
 	yvals = par('yaxp')
 	yinterval = par('yaxp')[2] / par('yaxp')[3]
 	axis(2,at= (seq(0,(ymax+yinterval/2),yinterval) - yinterval/2),labels=F,lwd=0,lwd.ticks=1,cex.axis=0.95)
@@ -205,7 +229,12 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
 }
 
 
-## Make a pretty QQ plot of p-values
+
+
+
+
+
+## Make a pretty QQ plot of p-values ### Add ymax.soft
 qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confidence.col='gray81',
 	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',ymax=8,ymax.soft=T,
 	highlight=NULL,highlight.col=c('green3','magenta'),highlight.bg=c('green3','magenta'),
@@ -219,9 +248,10 @@ qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confiden
 	d = d[!is.na(suppressWarnings(as.numeric(d$P))),] # remove non-numeric Ps
     d = d[d$P>0 & d$P<1,] # only Ps between 0 and 1
     
+    
 	if (!is.null(highlight) | !is.null(annotate)){
 		if (!("SNP" %in% names(d))) stop("Make sure your data frame contains columns SNP to use annotate or highlight feature.")
-		d = d[na.omit(d$SNP),]
+		d = d[d$SNP==na.omit(d$SNP),]
 		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
 		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
 	}
@@ -232,6 +262,7 @@ qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confiden
     if (!is.null(highlight) | !is.null(annotate)) names(e) = names(o) = d$SNP
 	
 	if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o) 
+	
 	if (!is.numeric(pt.cex) | pt.cex<0) pt.cex=0.5
 	if (!is.numeric(annotate.cex) | annotate.cex<0) annotate.cex=0.7
 	if (!is.numeric(annotate.font)) annotate.font=3
