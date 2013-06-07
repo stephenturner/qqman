@@ -11,9 +11,9 @@
 
 ### This is for testing purposes. ######################################
 # 	set.seed(42)
-# 	nchr=23
+# 	nchr=30
 # 	nsnps=1000
-# 	d=data.frame(
+# 	d = data.frame(
 # 		SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
 # 		CHR=rep(1:nchr,each=nsnps), 
 # 		BP=rep(1:nsnps,nchr), 
@@ -22,14 +22,14 @@
 # 	### d[d$SNP=='rs20762',]$P = 1e-29
 # 	top_snps = c('rs13895','rs20762')
 # 	surrounding_snps = list(	as.character(d$SNP[13795:13995]),
-# 							as.character(d$SNP[20662:20862])) 
-
-# 	### Figure out bug 
-# 	d = subset(d,d$CHR!=3)
-
-### CALL:
-### manhattan(d,annotate=top_snps,highlight=surrounding_snps)
-### qq(d,annotate=top_snps,highlight=top_snps)
+# 							as.character(d$SNP[20662:20862]))
+# 	
+# 	pvect = d$P
+# 	names(pvect) = d$SNP
+# 	
+# 	CALL:
+# 	manhattan(d,annotate=top_snps,highlight=surrounding_snps)
+# 	qq(pvect,annotate=top_snps,highlight=top_snps)
 #########################################################################
 
 # manhattan plot using base graphics
@@ -235,31 +235,29 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
 
 
 ## Make a pretty QQ plot of p-values ### Add ymax.soft
-qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confidence.col='gray81',
+qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.col='gray81',
 	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',ymax=8,ymax.soft=T,
 	highlight=NULL,highlight.col=c('green3','magenta'),highlight.bg=c('green3','magenta'),
 	annotate=NULL,annotate.cex=0.7,annotate.font=3, ...) {
 	#======================================================================================================
 	######## Check data and arguments; create observed and expected distributions
-	d = dataframe
-    
-    if (!("P" %in% names(d))) stop("Make sure your data frame contains columns P")
-    if (TRUE %in% is.na(suppressWarnings(as.numeric(d$P)))) warning('non-numeric, non-NA entries in P column of dataframe. attempting to remove..')
-	d = d[!is.na(suppressWarnings(as.numeric(d$P))),] # remove non-numeric Ps
-    d = d[d$P>0 & d$P<1,] # only Ps between 0 and 1
+	d = suppressWarnings(as.numeric(pvect))
+	names(d) = names(pvect)
+    d = d[!is.na(d)] # remove NA, and non-numeric [which were converted to NA during as.numeric()]
+    d = d[d>0 & d<1] # only Ps between 0 and 1
     
     
 	if (!is.null(highlight) | !is.null(annotate)){
-		if (!("SNP" %in% names(d))) stop("Make sure your data frame contains columns SNP to use annotate or highlight feature.")
-		d = d[d$SNP==na.omit(d$SNP),]
-		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
-		if (!is.null(highlight) & FALSE %in% (highlight %in% d$SNP)) stop ("D'oh! Highlight vector must be a subset of the SNP column of the dataframe.")
+		if (is.null(names(d))) stop("P-value vector must have names to use highlight or annotate features.")
+		d = d[!is.na(names(d))]
+		if (!is.null(highlight) & FALSE %in% (highlight %in% names(d))) stop ("D'oh! Highlight vector must be a subset of names(pvect).")
+		if (!is.null(annotate) & FALSE %in% (annotate %in% names(d))) stop ("D'oh! Annotate vector must be a subset of names(pvect).")
 	}
 	
-	d = d[order(d$P,decreasing=F),] # sort
-	o = -log10(d$P)
-    e = -log10( ppoints(length(d$P) ))
-    if (!is.null(highlight) | !is.null(annotate)) names(e) = names(o) = d$SNP
+	d = d[order(d,decreasing=F)] # sort
+	o = -log10(d)
+    e = -log10( ppoints(length(d) ))
+    if (!is.null(highlight) | !is.null(annotate)) names(e) = names(o) = names(d)
 	
 	if (!is.numeric(ymax) | ymax<max(o)) ymax <- max(o) 
 	
@@ -378,9 +376,6 @@ qq = function(dataframe,gridlines=F,gridlines.col='gray83',confidence=T,confiden
 	# Box
 	box()
 }
-
-
-
 
 
 
