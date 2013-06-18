@@ -1,17 +1,17 @@
 # Stephen Turner
 # http://StephenTurner.us/
 # http://GettingGeneticsDone.blogspot.com/
-# See license at http://gettinggeneticsdone.blogspot.com/p/copyright.html
 
-# Last updated: Tuesday, April 19, 2011
+# Daniel Capurso
+# UCSF
+# http://www.linkedin.com/in/dcapurso
+
+# Last major update: June 10, 2013
 # R code for making manhattan plots and QQ plots from plink output files. 
-# manhattan() with GWAS data this can take a lot of memory, recommended for use on 64bit machines only, for now. 
-# Altnernatively, use bmanhattan() , i.e., base manhattan. uses base graphics. way faster.
-
 
 ### This is for testing purposes. ######################################
 # 	set.seed(42)
-# 	nchr=30
+# 	nchr=22
 # 	nsnps=1000
 # 	d = data.frame(
 # 		SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
@@ -24,19 +24,19 @@
 # 	surrounding_snps = list(	as.character(d$SNP[13795:13995]),
 # 							as.character(d$SNP[20662:20862]))
 # 	
-# 	pvect = d$P
-# 	names(pvect) = d$SNP
+# 	pvector = d$P
+# 	names(pvector) = d$SNP
 # 	
-# 	CALL:
-# 	manhattan(d,annotate=top_snps,highlight=surrounding_snps)
-# 	qq(pvect,annotate=top_snps,highlight=top_snps)
+# 	#CALL:
+# 	#manhattan(d,annotate=top_snps,highlight=surrounding_snps)
+# 	#qq(pvector,annotate=top_snps,highlight=top_snps)
 #########################################################################
 
 # manhattan plot using base graphics
-manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray50'),pt.bg=c('gray10','gray50'),
-	pt.cex=0.45,gridlines=F,gridlines.col='gray83',ymax=8, ymax.soft=T, annotate=NULL,annotate.cex=0.7,annotate.font=3,
-	suggestiveline=-log10(1e-5), suggestiveline.col='blue', genomewideline=-log10(5e-8), genomewideline.col='red',
-	suggestiveline.lwd=1.5,genomewideline.lwd=1.5, 
+manhattan <- function(dataframe, limitchromosomes=NULL,pt.col=c('gray10','gray50'),pt.bg=c('gray10','gray50'),
+	pt.cex=0.45,pch=21,cex.axis=0.95,gridlines=F,gridlines.col='gray83',gridlines.lty=1,gridlines.lwd=1,ymax=8, ymax.soft=T, annotate=NULL,annotate.cex=0.7,annotate.font=3,
+	suggestiveline=-log10(1e-5), suggestiveline.col='blue', suggestiveline.lwd=1.5, suggestiveline.lty=1, 
+	genomewideline=-log10(5e-8), genomewideline.col='red', genomewideline.lwd=1.5, genomewideline.lty=1, 
 	highlight=NULL,highlight.col=c('green3','magenta'),highlight.bg=c('green3','magenta'),  ...) {
 	#============================================================================================
 	######## Check data and arguments
@@ -71,11 +71,11 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
 	if (is.character(suggestiveline.col[1]) & !(suggestiveline.col[1] %in% colors())) suggestiveline.col = 'blue'
 	if (is.character(genomewideline.col[1]) & !(genomewideline.col[1] %in% colors())) genomewideline.col = 'red'
 		
-    if(!is.null(chromosomes.limit)){
-    	if (TRUE %in% is.na(suppressWarnings(as.numeric(chromosomes.limit)))){
-    		stop('chromosomes.limit argument is not numeric') 
+    if(!is.null(limitchromosomes)){
+    	if (TRUE %in% is.na(suppressWarnings(as.numeric(limitchromosomes)))){
+    		stop('limitchromosomes argument is not numeric') 
     	} else {  
-    		d = d[d$CHR %in% as.numeric(chromosomes.limit), ]
+    		d = d[d$CHR %in% as.numeric(limitchromosomes), ]
     	}
     }
     
@@ -140,7 +140,7 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     #ymax = ceiling(ymax * 1.03)
     ymin = -ymax*0.03
     plot(0,col=F,xaxt='n',bty='n',xaxs='i',yaxs='i',xlim=c(xmin,xmax), ylim=c(ymin,ymax),
-    		xlab=xlabel,ylab=expression(-log[10](italic(p))),las=1)
+    		xlab=xlabel,ylab=expression(-log[10](italic(p))),las=1,cex.axis=cex.axis)
 	
 	# stagger labels
 	blank = rep('',length(labs))
@@ -155,20 +155,19 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
 		}
 	}
 	
-	#axis(1,at=ticks,labels=labs,lwd=0,lwd.ticks=1,cex.axis=0.95)
-	axis(1,at=ticks,labels=blank,lwd=0,lwd.ticks=1,cex.axis=0.95)
-	axis(1,at=ticks,labels=upperlabs,lwd=0,lwd.ticks=0,cex.axis=0.95,line=-0.25)
-	axis(1,at=ticks,labels=lowerlabs,lwd=0,lwd.ticks=0,cex.axis=0.95,line=0.25)
+	axis(1,at=ticks,labels=blank,lwd=0,lwd.ticks=1,cex.axis=cex.axis)
+	axis(1,at=ticks,labels=upperlabs,lwd=0,lwd.ticks=0,cex.axis=cex.axis,line=-0.25)
+	axis(1,at=ticks,labels=lowerlabs,lwd=0,lwd.ticks=0,cex.axis=cex.axis,line=0.25)
 	
 	yvals = par('yaxp')
 	yinterval = par('yaxp')[2] / par('yaxp')[3]
-	axis(2,at= (seq(0,(ymax+yinterval/2),yinterval) - yinterval/2),labels=F,lwd=0,lwd.ticks=1,cex.axis=0.95)
+	axis(2,at= (seq(0,(ymax+yinterval/2),yinterval) - yinterval/2),labels=F,lwd=0,lwd.ticks=1,cex.axis=cex.axis)
 	
     # Gridlines
 	if (isTRUE(gridlines)){
 		
-		abline(v=ticks,col=gridlines.col[1],lwd=1.0) #at ticks
-		abline(h=seq(0,ymax,yinterval),col=gridlines.col[1],lwd=1.0) # at labeled ticks
+		abline(v=ticks,col=gridlines.col[1],lwd=gridlines.lwd,lty=gridlines.lty) #at ticks
+		abline(h=seq(0,ymax,yinterval),col=gridlines.col[1],lwd=gridlines.lwd,lty=gridlines.lty) # at labeled ticks
 		#abline(h=(seq(0,ymax,yinterval) - yinterval/2),col=gridlines.col[1],lwd=1.0) # at unlabeled ticks
 	}
 	
@@ -203,20 +202,20 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
     
     icol=1
     for (i in unique(d.plain$CHR)) {
-        with(d.plain[d.plain$CHR==i, ],points(pos, logp, col=pt.col[icol],bg=pt.bg[icol],pch=21,cex=pt.cex,...))
+        with(d.plain[d.plain$CHR==i, ],points(pos, logp, col=pt.col[icol],bg=pt.bg[icol],cex=pt.cex,pch=pch,...))
         icol=icol+1
     }
     
     if (!is.null(highlight)){	
     	for (i in 1:length(highlight)){
     		d.highlight=d[which(d$SNP %in% highlight[[i]]), ]
-    		with(d.highlight, points(pos, logp, col=highlight.col[i],bg=highlight.bg[i], pch=21,cex=pt.cex, ...)) 
+    		with(d.highlight, points(pos, logp, col=highlight.col[i],bg=highlight.bg[i],cex=pt.cex,pch=pch,...)) 
     	}
     }
     
     # Significance lines
-    if (is.numeric(suggestiveline)) abline(h=suggestiveline, col=suggestiveline.col[1],lwd=1.5)
-    if (is.numeric(genomewideline)) abline(h=genomewideline, col=genomewideline.col[1],lwd=1.5)
+    if (is.numeric(suggestiveline)) abline(h=suggestiveline, col=suggestiveline.col[1],lwd=suggestiveline.lwd,lty=suggestiveline.lty)
+    if (is.numeric(genomewideline)) abline(h=genomewideline, col=genomewideline.col[1],lwd=genomewideline.lwd,lty=genomewideline.lty)
 
 	# Annotate
 	if (!is.null(annotate)){
@@ -235,14 +234,14 @@ manhattan <- function(dataframe, chromosomes.limit=NULL,pt.col=c('gray10','gray5
 
 
 ## Make a pretty QQ plot of p-values ### Add ymax.soft
-qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.col='gray81',
-	pt.cex=0.5,pt.col='black',pt.bg='black',abline.col='red',ymax=8,ymax.soft=T,
+qq = function(pvector,gridlines=F,gridlines.col='gray83',gridlines.lwd=1,gridlines.lty=1,confidence=T,confidence.col='gray81',
+	pt.cex=0.5,pt.col='black',pt.bg='black',pch=21,abline.col='red',abline.lwd=1.8,abline.lty=1,ymax=8,ymax.soft=T,
 	highlight=NULL,highlight.col=c('green3','magenta'),highlight.bg=c('green3','magenta'),
-	annotate=NULL,annotate.cex=0.7,annotate.font=3, ...) {
+	annotate=NULL,annotate.cex=0.7,annotate.font=3,cex.axis=0.95,...) {
 	#======================================================================================================
 	######## Check data and arguments; create observed and expected distributions
-	d = suppressWarnings(as.numeric(pvect))
-	names(d) = names(pvect)
+	d = suppressWarnings(as.numeric(pvector))
+	names(d) = names(pvector)
     d = d[!is.na(d)] # remove NA, and non-numeric [which were converted to NA during as.numeric()]
     d = d[d>0 & d<1] # only Ps between 0 and 1
     
@@ -250,8 +249,8 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 	if (!is.null(highlight) | !is.null(annotate)){
 		if (is.null(names(d))) stop("P-value vector must have names to use highlight or annotate features.")
 		d = d[!is.na(names(d))]
-		if (!is.null(highlight) & FALSE %in% (highlight %in% names(d))) stop ("D'oh! Highlight vector must be a subset of names(pvect).")
-		if (!is.null(annotate) & FALSE %in% (annotate %in% names(d))) stop ("D'oh! Annotate vector must be a subset of names(pvect).")
+		if (!is.null(highlight) & FALSE %in% (highlight %in% names(d))) stop ("D'oh! Highlight vector must be a subset of names(pvector).")
+		if (!is.null(annotate) & FALSE %in% (annotate %in% names(d))) stop ("D'oh! Annotate vector must be a subset of names(pvector).")
 	}
 	
 	d = d[order(d,decreasing=F)] # sort
@@ -301,23 +300,23 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 	################################
 	
 	# Initialize plot
-	print('Setting up plot.')
-	print(ymax)
+	#print('Setting up plot.')
+	#print(ymax)
 	xspace = 0.078
 	xmax = max(e) * 1.019
     xmin = max(e) * -0.035
     #ymax = ceiling(ymax * 1.03)
     ymin = -ymax*0.03
 	plot(0,xlab=expression(Expected~~-log[10](italic(p))),ylab=expression(Observed~~-log[10](italic(p))),
-			col=F,las=1,xaxt='n',xlim=c(xmin,xmax),ylim=c(ymin,ymax),bty='n',xaxs='i',yaxs='i',cex.axis=0.95)
-	axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1),cex.axis=0.95,lwd=0,lwd.ticks=1)
+			col=F,las=1,xaxt='n',xlim=c(xmin,xmax),ylim=c(ymin,ymax),bty='n',xaxs='i',yaxs='i',cex.axis=cex.axis)
+	axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1),cex.axis=cex.axis,lwd=0,lwd.ticks=1)
 	
 	# Grid lines
 	if (isTRUE(gridlines)){
 		yvals = par('yaxp')
 		yticks = seq(yvals[1],yvals[2],yvals[2]/yvals[3])
-		abline(v=seq(0,max(e),1),col=gridlines.col[1],lwd=1.0)
-		abline(h=yticks,col=gridlines.col[1],lwd=1.0)
+		abline(v=seq(0,max(e),1),col=gridlines.col[1],lwd=gridlines.lwd,lty=gridlines.lty)
+		abline(h=yticks,col=gridlines.col[1],lwd=gridlines.lwd,lty=gridlines.lty)
 	}
 	
 	 #Confidence intervals
@@ -333,7 +332,7 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 
 	 # Find approximate confidence intervals
 	if (isTRUE(confidence)){
-		print('Plotting confidence intervals.')
+		#print('Plotting confidence intervals.')
 		ci = apply(cbind( 1:length(e), rep(length(e),length(e))), MARGIN=1, FUN=find_conf_intervals)
 	 	bks = append(seq(10000,length(e),100),length(e)+1)
 		for (i in 1:(length(bks)-1)){
@@ -350,7 +349,7 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 	}
 	
 	# Points (with optional highlighting)
-	print('Plotting data points.')
+	#print('Plotting data points.')
 	fills = rep(pt.bg,length(o))
 	borders = rep(pt.col,length(o))
 	names(fills) = names(borders) = names(o)
@@ -358,14 +357,14 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 		borders[highlight] = rep(NA,length(highlight))
 		fills[highlight] = rep(NA,length(highlight))
 	}
-	points(e,o,pch=21,cex=pt.cex,col=borders,bg=fills)
+	points(e,o,pch=pch,cex=pt.cex,col=borders,bg=fills)
 	
 	if (!is.null(highlight)){
-		points(e[highlight],o[highlight],pch=21,cex=pt.cex,col=highlight.col,bg=highlight.bg)
+		points(e[highlight],o[highlight],pch=pch,cex=pt.cex,col=highlight.col,bg=highlight.bg)
 	}
 	
 	#Abline
-	abline(0,1,col=abline.col,lwd=1.8)
+	abline(0,1,col=abline.col,lwd=abline.lwd,lty=abline.lty)
 	
 	# Annotate SNPs
 	if (!is.null(annotate)){
@@ -380,103 +379,110 @@ qq = function(pvect,gridlines=F,gridlines.col='gray83',confidence=T,confidence.c
 
 
 
-### OLD GGPLOT2 CODE ###
 
-# manhattan plot using ggplot2
-gg.manhattan = function(dataframe, title=NULL, max.y="max", suggestiveline=0, genomewideline=-log10(5e-8), size.x.labels=9, size.y.labels=10, annotate=F, SNPlist=NULL) {
-library(ggplot2)
-    if (annotate & is.null(SNPlist)) stop("You requested annotation but provided no SNPlist!")
-	d=dataframe
-	#limit to only chrs 1-23?
-	d=d[d$CHR %in% 1:23, ]
-	if ("CHR" %in% names(d) & "BP" %in% names(d) & "P" %in% names(d) ) {
-		d=na.omit(d)
-		d=d[d$P>0 & d$P<=1, ]
-		d$logp = -log10(d$P)
-		d$pos=NA
-		ticks=NULL
-		lastbase=0
-		#new 2010-05-10
-		numchroms=length(unique(d$CHR))
-		if (numchroms==1) {
-			d$pos=d$BP
-		} else {
-		
-			for (i in unique(d$CHR)) {
-				if (i==1) {
-					d[d$CHR==i, ]$pos=d[d$CHR==i, ]$BP
-				}	else {
-					lastbase=lastbase+tail(subset(d,CHR==i-1)$BP, 1)
-					d[d$CHR==i, ]$pos=d[d$CHR==i, ]$BP+lastbase
-				}
-				ticks=c(ticks, d[d$CHR==i, ]$pos[floor(length(d[d$CHR==i, ]$pos)/2)+1])
-			}
-			ticklim=c(min(d$pos),max(d$pos))
 
-		}
-		mycols=rep(c("gray10","gray60"),max(d$CHR))
-		if (max.y=="max") maxy=ceiling(max(d$logp)) else maxy=max.y
-		if (maxy<8) maxy=8
-		if (annotate) d.annotate=d[as.numeric(substr(d$SNP,3,100)) %in% SNPlist, ]
-		if (numchroms==1) {
-			plot=qplot(pos,logp,data=d,ylab=expression(-log[10](italic(p))), xlab=paste("Chromosome",unique(d$CHR),"position"))
-		}	else {
-			plot=qplot(pos,logp,data=d, ylab=expression(-log[10](italic(p))) , colour=factor(CHR))
-			plot=plot+scale_x_continuous(name="Chromosome", breaks=ticks, labels=(unique(d$CHR)))
-			plot=plot+scale_y_continuous(limits=c(0,maxy), breaks=1:maxy, labels=1:maxy)
-			plot=plot+scale_colour_manual(value=mycols)
-		}
-		if (annotate) 	plot=plot + geom_point(data=d.annotate, colour=I("green3")) 
-		plot=plot + opts(legend.position = "none") 
-		plot=plot + opts(title=title)
-		plot=plot+opts(
-			panel.background=theme_blank(), 
-			panel.grid.minor=theme_blank(),
-			axis.text.x=theme_text(size=size.x.labels, colour="grey50"), 
-			axis.text.y=theme_text(size=size.y.labels, colour="grey50"), 
-			axis.ticks=theme_segment(colour=NA)
-		)
-		if (suggestiveline) plot=plot+geom_hline(yintercept=suggestiveline,colour="blue", alpha=I(1/3))
-		if (genomewideline) plot=plot+geom_hline(yintercept=genomewideline,colour="red")
-		plot
-	}	else {
-		stop("Make sure your data frame contains columns CHR, BP, and P")
-	}
-}
 
-gg.qq = function(pvector, title=NULL, spartan=F) {
-	library(ggplot2)
-	o = -log10(sort(pvector,decreasing=F))
-	#e = -log10( 1:length(o)/length(o) )
-	e = -log10( ppoints(length(pvector) ))
-	plot=qplot(e,o, xlim=c(0,max(e)), ylim=c(0,max(o))) + stat_abline(intercept=0,slope=1, col="red")
-	plot=plot+opts(title=title)
-	plot=plot+scale_x_continuous(name=expression(Expected~~-log[10](italic(p))))
-	plot=plot+scale_y_continuous(name=expression(Observed~~-log[10](italic(p))))
-	if (spartan) plot=plot+opts(panel.background=theme_rect(col="grey50"), panel.grid.minor=theme_blank())
-	plot
-}
 
-gg.qqman = function(data="plinkresults") {
-	myqqplot = ggqq(data$P)
-	mymanplot = ggmanhattan(data)
-	ggsave(file="qqplot.png",myqqplot,w=5,h=5,dpi=100)
-	ggsave(file="manhattan.png",mymanplot,width=12,height=9,dpi=100)
-}
-
-gg.qqmanall= function(command="ls *assoc") {
-	filelist=system(command,intern=T)
-	datalist=NULL
-	for (i in filelist) {datalist[[i]]=read.table(i,T)}
-	highestneglogp=ceiling(max(sapply(datalist, function(df) max(na.omit(-log10(df$P))))))
-	print(paste("Highest -log10(P) = ",highestneglogp),quote=F)
-	start=Sys.time()
-	for (i in names(datalist)) {
-		myqqplot=ggqq(datalist[[i]]$P, title=i)
-		ggsave(file=paste("qqplot-",    i, ".png", sep=""),myqqplot, width=5, height=5,dpi=100)
-		mymanplot=ggmanhattan(datalist[[i]], title=i, max.y=highestneglogp)
-		ggsave(file=paste("manhattan-", i, ".png", sep=""),mymanplot,width=12,height=9,dpi=100)
-	}
-	end=Sys.time()
-	print(elapsed<-end-start)
-}
+# Old ggplot2 code --------------------------------------------------------
+#
+## manhattan plot using ggplot2
+# gg.manhattan = function(dataframe, title=NULL, max.y="max", suggestiveline=0, genomewideline=-log10(5e-8), size.x.labels=9, size.y.labels=10, annotate=F, SNPlist=NULL) {
+# library(ggplot2)
+#     if (annotate & is.null(SNPlist)) stop("You requested annotation but provided no SNPlist!")
+# 	d=dataframe
+# 	#limit to only chrs 1-23?
+# 	d=d[d$CHR %in% 1:23, ]
+# 	if ("CHR" %in% names(d) & "BP" %in% names(d) & "P" %in% names(d) ) {
+# 		d=na.omit(d)
+# 		d=d[d$P>0 & d$P<=1, ]
+# 		d$logp = -log10(d$P)
+# 		d$pos=NA
+# 		ticks=NULL
+# 		lastbase=0
+# 		#new 2010-05-10
+# 		numchroms=length(unique(d$CHR))
+# 		if (numchroms==1) {
+# 			d$pos=d$BP
+# 		} else {
+# 		
+# 			for (i in unique(d$CHR)) {
+# 				if (i==1) {
+# 					d[d$CHR==i, ]$pos=d[d$CHR==i, ]$BP
+# 				}	else {
+# 					lastbase=lastbase+tail(subset(d,CHR==i-1)$BP, 1)
+# 					d[d$CHR==i, ]$pos=d[d$CHR==i, ]$BP+lastbase
+# 				}
+# 				ticks=c(ticks, d[d$CHR==i, ]$pos[floor(length(d[d$CHR==i, ]$pos)/2)+1])
+# 			}
+# 			ticklim=c(min(d$pos),max(d$pos))
+# 
+# 		}
+# 		mycols=rep(c("gray10","gray60"),max(d$CHR))
+# 		if (max.y=="max") maxy=ceiling(max(d$logp)) else maxy=max.y
+# 		if (maxy<8) maxy=8
+# 		if (annotate) d.annotate=d[as.numeric(substr(d$SNP,3,100)) %in% SNPlist, ]
+# 		if (numchroms==1) {
+# 			plot=qplot(pos,logp,data=d,ylab=expression(-log[10](italic(p))), xlab=paste("Chromosome",unique(d$CHR),"position"))
+# 		}	else {
+# 			plot=qplot(pos,logp,data=d, ylab=expression(-log[10](italic(p))) , colour=factor(CHR))
+# 			plot=plot+scale_x_continuous(name="Chromosome", breaks=ticks, labels=(unique(d$CHR)))
+# 			plot=plot+scale_y_continuous(limits=c(0,maxy), breaks=1:maxy, labels=1:maxy)
+# 			plot=plot+scale_colour_manual(value=mycols)
+# 		}
+# 		if (annotate) 	plot=plot + geom_point(data=d.annotate, colour=I("green3")) 
+# 		plot=plot + opts(legend.position = "none") 
+# 		plot=plot + opts(title=title)
+# 		plot=plot+opts(
+# 			panel.background=theme_blank(), 
+# 			panel.grid.minor=theme_blank(),
+# 			axis.text.x=theme_text(size=size.x.labels, colour="grey50"), 
+# 			axis.text.y=theme_text(size=size.y.labels, colour="grey50"), 
+# 			axis.ticks=theme_segment(colour=NA)
+# 		)
+# 		if (suggestiveline) plot=plot+geom_hline(yintercept=suggestiveline,colour="blue", alpha=I(1/3))
+# 		if (genomewideline) plot=plot+geom_hline(yintercept=genomewideline,colour="red")
+# 		plot
+# 	}	else {
+# 		stop("Make sure your data frame contains columns CHR, BP, and P")
+# 	}
+# }
+# 
+# ## QQ plot using ggplot2
+# gg.qq = function(pvector, title=NULL, spartan=F) {
+# 	library(ggplot2)
+# 	o = -log10(sort(pvector,decreasing=F))
+# 	#e = -log10( 1:length(o)/length(o) )
+# 	e = -log10( ppoints(length(pvector) ))
+# 	plot=qplot(e,o, xlim=c(0,max(e)), ylim=c(0,max(o))) + stat_abline(intercept=0,slope=1, col="red")
+# 	plot=plot+opts(title=title)
+# 	plot=plot+scale_x_continuous(name=expression(Expected~~-log[10](italic(p))))
+# 	plot=plot+scale_y_continuous(name=expression(Observed~~-log[10](italic(p))))
+# 	if (spartan) plot=plot+opts(panel.background=theme_rect(col="grey50"), panel.grid.minor=theme_blank())
+# 	plot
+# }
+# 
+# ## Make a qq and manhattan plot
+# gg.qqman = function(data="plinkresults") {
+# 	myqqplot = ggqq(data$P)
+# 	mymanplot = ggmanhattan(data)
+# 	ggsave(file="qqplot.png",myqqplot,w=5,h=5,dpi=100)
+# 	ggsave(file="manhattan.png",mymanplot,width=12,height=9,dpi=100)
+# }
+# 
+# ## make qq and manhattan plots for a list of files
+# gg.qqmanall= function(command="ls *assoc") {
+# 	filelist=system(command,intern=T)
+# 	datalist=NULL
+# 	for (i in filelist) {datalist[[i]]=read.table(i,T)}
+# 	highestneglogp=ceiling(max(sapply(datalist, function(df) max(na.omit(-log10(df$P))))))
+# 	print(paste("Highest -log10(P) = ",highestneglogp),quote=F)
+# 	start=Sys.time()
+# 	for (i in names(datalist)) {
+# 		myqqplot=ggqq(datalist[[i]]$P, title=i)
+# 		ggsave(file=paste("qqplot-",    i, ".png", sep=""),myqqplot, width=5, height=5,dpi=100)
+# 		mymanplot=ggmanhattan(datalist[[i]], title=i, max.y=highestneglogp)
+# 		ggsave(file=paste("manhattan-", i, ".png", sep=""),mymanplot,width=12,height=9,dpi=100)
+# 	}
+# 	end=Sys.time()
+# 	print(elapsed<-end-start)
+# }
