@@ -17,7 +17,7 @@ manhattan(results, pt.col=c("black","grey50","darkorange1"), pch=20, genomewidel
 download.file("https://raw.github.com/stephenturner/qqman/master/snps.txt", destfile="./snps.txt", method="curl")
 snps_to_highlight <- scan("./snps.txt", character())
 manhattan(results, highlight=snps_to_highlight, pch=20, main="Manhattan Plot")
-manhattan(subset(results, CHR==11), pch=20, annotate=snps_to_highlight, main="Chromosome 11")
+manhattan(subset(results, CHR==11), pch=20, highlight=snps_to_highlight, main="Chromosome 11")
 
 ## Make a q-q plot of the p-values
 qq(results$P)
