@@ -186,7 +186,7 @@ manhattan <- function(dataframe, limitchromosomes=NULL,pt.col=c('gray10','gray50
     	
     	if ('SNP' %in% names(d)){
     		for (i in 1:length(highlight)){
-				if (FALSE %in% (highlight[[i]] %in% d$SNP)) stop ("D'oh! Highlight vector/list must be a subset of the SNP column.")
+				#if (FALSE %in% (highlight[[i]] %in% d$SNP)) stop ("D'oh! Highlight vector/list must be a subset of the SNP column.")
 			}
 		} else {
 			stop("D'oh! Dataframe must have a column $SNP with rs_ids to use highlight feature.")
