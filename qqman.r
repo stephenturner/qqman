@@ -427,7 +427,7 @@ qq = function(pvector,gridlines=F,gridlines.col='gray83',gridlines.lwd=1,gridlin
 # 			plot=qplot(pos,logp,data=d, ylab=expression(-log[10](italic(p))) , colour=factor(CHR))
 # 			plot=plot+scale_x_continuous(name="Chromosome", breaks=ticks, labels=(unique(d$CHR)))
 # 			plot=plot+scale_y_continuous(limits=c(0,maxy), breaks=1:maxy, labels=1:maxy)
-# 			plot=plot+scale_colour_manual(value=mycols)
+# 			plot=plot+scale_colour_manual(values=mycols)
 # 		}
 # 		if (annotate) 	plot=plot + geom_point(data=d.annotate, colour=I("green3")) 
 # 		plot=plot + opts(legend.position = "none") 
