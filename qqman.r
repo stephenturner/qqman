@@ -54,7 +54,13 @@ manhattan <- function(dataframe, limitchromosomes=NULL,pt.col=c('gray10','gray50
     
     if (!is.null(annotate)){
         if ('SNP' %in% names(d)){
-            if (FALSE %in% (annotate %in% d$SNP)) stop ("D'oh! Annotate vector must be a subset of the SNP column.")
+        	missing_annotate = annotate[!(annotate %in% d$SNP)]
+        	annotate = annotate[annotate %in% d$SNP]
+        	
+        	if (length(missing_annotate)>0){
+        		print('These SNPs were not annotated because of missing data:')
+        		print(missing_annotate)
+        	}
         } else {
             stop("D'oh! Dataframe must have a column $SNP with rs_ids to use annotate feature.")
         }
@@ -180,16 +186,22 @@ manhattan <- function(dataframe, limitchromosomes=NULL,pt.col=c('gray10','gray50
             stop('"highlight" must be a char vector (for 1 color) or list (for multi color).')
         }
         
-        if (class(highlight)=='character'){ #if char vector, make list for consistency in plotting below
-            highlight = list(highlight)
-        }
         
         if ('SNP' %in% names(d)){
-            for (i in 1:length(highlight)){
-                if (FALSE %in% (highlight[[i]] %in% d$SNP)) stop ("D'oh! Highlight vector/list must be a subset of the SNP column.")
-            }
+            missing_highlight = highlight[!(highlight %in% d$SNP)]
+        	highlight = highlight[highlight %in% d$SNP]
+        	
+        	if (length(missing_highlight)>0){
+        		print('These SNPs were not highlightd because of missing data:')
+        		print(missing_highlight)
+        	}
+        
         } else {
             stop("D'oh! Dataframe must have a column $SNP with rs_ids to use highlight feature.")
+        }
+        
+        if (class(highlight)=='character'){ #if char vector, make list for consistency in plotting below
+            highlight = list(highlight)
         }
         
         highlight.col = rep(highlight.col,length(highlight))[1:length(highlight)]
