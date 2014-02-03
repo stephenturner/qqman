@@ -146,7 +146,7 @@ manhattan <- function(dataframe, limitchromosomes=NULL,pt.col=c('gray10','gray50
     #ymax = ceiling(ymax * 1.03)
     ymin = -ymax*0.03
     plot(0,col=F,xaxt='n',bty='n',xaxs='i',yaxs='i',xlim=c(xmin,xmax), ylim=c(ymin,ymax),
-            xlab=xlabel,ylab=expression(-log[10](italic(p))),las=1,cex.axis=cex.axis)
+            xlab=xlabel,ylab=expression(-log[10](italic(p))),las=1,cex.axis=cex.axis, ...)
     
     # stagger labels
     blank = rep('',length(labs))
