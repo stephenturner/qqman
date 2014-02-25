@@ -320,7 +320,7 @@ qq = function(pvector,gridlines=F,gridlines.col='gray83',gridlines.lwd=1,gridlin
     #ymax = ceiling(ymax * 1.03)
     ymin = -ymax*0.03
     plot(0,xlab=expression(Expected~~-log[10](italic(p))),ylab=expression(Observed~~-log[10](italic(p))),
-            col=F,las=1,xaxt='n',xlim=c(xmin,xmax),ylim=c(ymin,ymax),bty='n',xaxs='i',yaxs='i',cex.axis=cex.axis)
+            col=F,las=1,xaxt='n',xlim=c(xmin,xmax),ylim=c(ymin,ymax),bty='n',xaxs='i',yaxs='i',cex.axis=cex.axis, ...)
     axis(side=1,labels=seq(0,max(e),1),at=seq(0,max(e),1),cex.axis=cex.axis,lwd=0,lwd.ticks=1)
     
     # Grid lines
