@@ -4,7 +4,6 @@
 \alias{gwasResults}
 \title{Simulated GWAS results}
 \description{
-Simulated GWAS results as obtained from \code{plink
---assoc}.
+Simulated GWAS results as obtained from \code{plink --assoc}.
 }
 

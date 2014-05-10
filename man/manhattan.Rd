@@ -9,53 +9,43 @@ manhattan(x, chr = "CHR", bp = "BP", p = "P", snp = "SNP",
   highlight = NULL, ...)
 }
 \arguments{
-  \item{x}{A data.frame with columns "BP," "CHR," "P," and
-  optionally, "SNP."}
+\item{x}{A data.frame with columns "BP," "CHR," "P," and optionally, "SNP."}
 
-  \item{chr}{A string denoting the column name for the
-  chromosome. Defaults to PLINK's "CHR." Said column must
-  be numeric. If you have X, Y, or MT chromosomes, be sure
-  to renumber these 23, 24, 25, etc.}
+\item{chr}{A string denoting the column name for the chromosome. Defaults to
+PLINK's "CHR." Said column must be numeric. If you have X, Y, or MT
+chromosomes, be sure to renumber these 23, 24, 25, etc.}
 
-  \item{bp}{A string denoting the column name for the
-  chromosomal position. Defaults to PLINK's "BP." Said
-  column must be numeric.}
+\item{bp}{A string denoting the column name for the chromosomal position.
+Defaults to PLINK's "BP." Said column must be numeric.}
 
-  \item{p}{A string denoting the column name for the
-  p-value. Defaults to PLINK's "P." Said column must be
-  numeric.}
+\item{p}{A string denoting the column name for the p-value. Defaults to
+PLINK's "P." Said column must be numeric.}
 
-  \item{snp}{A string denoting the column name for the SNP
-  name (rs number). Defaults to PLINK's "SNP." Said column
-  should be a character.}
+\item{snp}{A string denoting the column name for the SNP name (rs number).
+Defaults to PLINK's "SNP." Said column should be a character.}
 
-  \item{col}{A character vector indicating which colors to
-  alternate.}
+\item{col}{A character vector indicating which colors to alternate.}
 
-  \item{ymax}{The upper limit to the y-axis. Set
-  automatically based on the most significant SNP unless
-  set here specifically.}
+\item{ymax}{The upper limit to the y-axis. Set automatically based on the
+most significant SNP unless set here specifically.}
 
-  \item{suggestiveline}{Where to draw a "suggestive" line.
-  Default -log10(1e-5). Set to FALSE to disable.}
+\item{suggestiveline}{Where to draw a "suggestive" line. Default
+-log10(1e-5). Set to FALSE to disable.}
 
-  \item{genomewideline}{Where to draw a "genome-wide
-  sigificant" line. Default -log10(5e-8). Set to FALSE to
-  disable.}
+\item{genomewideline}{Where to draw a "genome-wide sigificant" line. Default
+-log10(5e-8). Set to FALSE to disable.}
 
-  \item{highlight}{A character vector of SNPs in your
-  dataset to highlight. These SNPs should all be in your
-  dataset.}
+\item{highlight}{A character vector of SNPs in your dataset to highlight.
+These SNPs should all be in your dataset.}
 
-  \item{...}{Arguments passed on to other plot/points
-  functions}
+\item{...}{Arguments passed on to other plot/points functions}
 }
 \value{
 A manhattan plot.
 }
 \description{
-Creates a manhattan plot from PLINK assoc output (or any
-data frame with chromosome, position, and p-value).
+Creates a manhattan plot from PLINK assoc output (or any data frame with
+chromosome, position, and p-value).
 }
 \examples{
 manhattan(gwasResults)

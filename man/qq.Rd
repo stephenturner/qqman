@@ -6,16 +6,15 @@
 qq(pvector, ...)
 }
 \arguments{
-  \item{pvector}{A numeric vector of p-values.}
+\item{pvector}{A numeric vector of p-values.}
 
-  \item{...}{Other arguments passed to \code{plot()}}
+\item{...}{Other arguments passed to \code{plot()}}
 }
 \value{
 A Q-Q plot.
 }
 \description{
-Creates a quantile-quantile plot from p-values from a GWAS
-study.
+Creates a quantile-quantile plot from p-values from a GWAS study.
 }
 \examples{
 qq(gwasResults$P)

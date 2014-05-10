@@ -8,7 +8,6 @@ Depends:
     R (>= 3.0.0)
 Suggests:
     knitr
-License: GPL-3 + file LICENSE
+License: GPL-3
 LazyData: true
 VignetteBuilder: knitr
-Roxygen: list(wrap = TRUE)

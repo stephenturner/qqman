@@ -5,8 +5,8 @@
 \alias{qqman-package}
 \title{Create Q-Q and manhattan plots for GWAS data.}
 \description{
-A package for creating Q-Q and manhattan plots for GWAS
-data. See the package vignette for details: \cr\cr
+A package for creating Q-Q and manhattan plots for GWAS data. See the package
+vignette for details: \cr\cr
 \code{vignette("qqman")}
 }
 \author{
