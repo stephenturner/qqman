@@ -2,9 +2,9 @@
 
 ## Citation
 
-Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. *biorXiv* DOI: .
+If you'd like to cite qqman (appreciated but not required), please cite the pre-print below:
 
-Read the preprint here: xx
+Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. [*biorXiv* DOI: 10.1101/005165](http://biorxiv.org/content/early/2014/05/14/005165).
 
 ## Installation
 
