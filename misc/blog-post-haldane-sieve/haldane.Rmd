@@ -1,0 +1,74 @@
+```{r, include=FALSE}
+library(qqman)
+library(knitr)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE)
+```
+
+# qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots
+
+Three years ago I wrote a [blog post on how to create manhattan plots in R](http://gettinggeneticsdone.blogspot.com/2011/04/annotated-manhattan-plots-and-qq-plots.html). After hundreds of comments pointing out bugs and other issues, I've finally cleaned up this code and turned it into an R package.
+
+The qqman R package is on CRAN: <http://cran.r-project.org/web/packages/qqman/>
+
+The source code is on GitHub: <https://github.com/stephenturner/qqman>
+
+The pre-print is on biorXiv: Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. biorXiv DOI: [10.1101/005165](http://biorxiv.org/content/early/2014/05/14/005165).
+
+Here's a short demo of the package for creating Q-Q and manhattan plots from GWAS results.
+
+## Installation
+
+First, let's install and load the package. We can see more examples by viewing the package vignette. 
+
+```{r, eval=FALSE}
+# Install only once:
+install.packages("qqman")
+
+# Load every time you use it:
+library(qqman)
+```
+
+The **qqman** package includes functions for creating manhattan plots (the `manhattan()` function) and Q-Q plots (with the `qq()` function) from GWAS results. The `gwasResults` data.frame included with the package has simulated results for 16,470 SNPs on 22 chromosomes in a format similar to the output from PLINK. Take a look at the data:
+
+```{r}
+head(gwasResults)
+```
+
+## Creating manhattan and Q-Q plots
+
+Let's make a basic manhattan plot. If you're using results from PLINK where columns are named `SNP`, `CHR`, `BP`, and `P`, you only need to call the `manhattan()` function on the results data.frame you read in.
+
+```{r, manhattan_01_basic}
+manhattan(gwasResults)
+```
+
+We can also change the colors, add a title, and remove the genome-wide significance and "suggestive" lines:
+
+```{r manhattan_02_color_title_lines}
+manhattan(gwasResults, col=c("blue4", "orange3"), main="Results from simulated trait", genomewideline=FALSE, suggestiveline=FALSE)
+```
+
+Let's highlight some SNPs of interest on chromosome 3. The 100 SNPs we're highlighting here are in a character vector called `snpsOfInterest`. You'll get a warning if you try to highlight SNPs that don't exist.
+
+```{r manhattan_03_highlight}
+head(snpsOfInterest)
+manhattan(gwasResults, highlight=snpsOfInterest)
+```
+
+We can combine highlighting and limiting to a single chromosome to "zoom in" on an interesting chromosome or region:
+
+```{r manhattan_04_highlight_chr}
+manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, main="Chr 3 Results")
+```
+
+Finally, creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. You can optionally provide a title.
+
+```{r qq, fig.width=8, fig.height=8}
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+```
+
+Read the [blog post](http://gettinggeneticsdone.blogspot.com/2014/05/qqman-r-package-for-qq-and-manhattan-plots-for-gwas-results.html) or check out the [package vignette](http://cran.r-project.org/web/packages/qqman/vignettes/qqman.html) for more examples and options.
+
+```{r}
+vignette("qqman")
+```
