@@ -44,7 +44,7 @@ gwasResults <- d
 save(gwasResults, file="data/gwasResults.RData")
 ```
 
-The **manhattan** package includes functions for creating manhattan plots and q-q plots from GWAS results. The `gwasResults` data.frame included with the package has simulated results for 16,470 SNPs on 22 chromosomes. Take a look at the data:
+The **qqman** package includes functions for creating manhattan plots and q-q plots from GWAS results. The `gwasResults` data.frame included with the package has simulated results for 16,470 SNPs on 22 chromosomes. Take a look at the data:
 
 ```{r}
 str(gwasResults)
