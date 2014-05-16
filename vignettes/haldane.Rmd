@@ -1,0 +1,131 @@
+```{r, include=FALSE}
+library(qqman)
+library(knitr)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE)
+```
+
+# qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots
+
+Three years ago I wrote a [blog post on how to create manhattan plots in R](http://gettinggeneticsdone.blogspot.com/2011/04/annotated-manhattan-plots-and-qq-plots.html). After hundreds of comments pointing out bugs and other issues, I've finally cleaned up this code and turned it into an R package.
+
+The qqman R package is on CRAN: <http://cran.r-project.org/web/packages/qqman/>
+
+The source code is on GitHub: <https://github.com/stephenturner/qqman>
+
+The pre-print is on biorXiv: [Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. biorXiv DOI: 10.1101/005165](http://biorxiv.org/content/early/2014/05/14/005165).
+
+Here's a short demo of the package for creating Q-Q and manhattan plots from GWAS results.
+
+```{r generatedata, eval=FALSE, echo=FALSE}
+# This code used to generate the test data. Runs slow, but does the job.
+chrstats <- data.frame(chr=1:22, nsnps=1500)
+chrstats$nsnps <- with(chrstats, round(nsnps/chr^(1/3)))
+chrstats
+
+d <- data.frame(SNP=rep(NA, sum(chrstats$nsnps)), 
+                CHR=rep(NA, sum(chrstats$nsnps)), 
+                BP=rep(NA, sum(chrstats$nsnps)), 
+                P=rep(NA, sum(chrstats$nsnps)))
+snpi <- 1
+set.seed(42)
+for (i in chrstats$chr) {
+    for (j in 1:chrstats[i, 2]) {
+        d[snpi, ]$SNP=paste0("rs", snpi)
+        d[snpi, ]$CHR=i
+        d[snpi, ]$BP=j
+        d[snpi, ]$P=runif(1)
+        snpi <- snpi+1
+    }
+}
+
+divisor <- c(seq(2,50,2), seq(50,2,-2))
+divisor <- divisor^4
+length(divisor)
+d[3026:3075, ]$P <- d[3026:3075, ]$P/divisor
+snpsOfInterest <- paste0("rs", 3001:3100)
+qq(d$P)
+manhattan(d, highlight=snpsOfInterest)
+gwasResults <- d
+save(gwasResults, file="data/gwasResults.RData")
+```
+
+The **manhattan** package includes functions for creating manhattan plots and q-q plots from GWAS results. The `gwasResults` data.frame included with the package has simulated results for 16,470 SNPs on 22 chromosomes. Take a look at the data:
+
+```{r}
+str(gwasResults)
+head(gwasResults)
+tail(gwasResults)
+```
+
+How many SNPs on each chromosome?
+
+```{r}
+as.data.frame(table(gwasResults$CHR))
+```
+
+## Creating manhattan plots
+
+Now, let's make a basic manhattan plot. 
+
+```{r}
+manhattan(gwasResults)
+```
+
+We can also pass in other graphical parameters. Let's add a title (`main=`), reduce the point size to 50%(`cex=`), and reduce the font size of the axis labels to 80% (`cex.axis=`):
+
+```{r}
+manhattan(gwasResults, main="Manhattan Plot", cex=0.5, cex.axis=0.8)
+```
+
+Let's change the colors and increase the maximum y-axis:
+
+```{r}
+manhattan(gwasResults, col=c("blue4", "orange3"), ymax=12)
+```
+
+Let's remove the suggestive and genome-wide significance lines:
+
+```{r}
+manhattan(gwasResults, suggestiveline=F, genomewideline=F)
+```
+
+Let's look at a single chromosome:
+
+```{r}
+manhattan(subset(gwasResults, CHR==1))
+```
+
+Let's highlight some SNPs of interest on chromosome 3. The 100 SNPs we're highlighting here are in a character vector called `snpsOfInterest`. You'll get a warning if you try to highlight SNPs that don't exist.
+
+```{r}
+str(snpsOfInterest)
+manhattan(gwasResults, highlight=snpsOfInterest)
+```
+
+We can combine highlighting and limiting to a single chromosome:
+
+```{r}
+manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, main="Chr 3")
+```
+
+A few notes on creating manhattan plots:
+
+* Run `str(gwasResults)`. Notice that the `gwasResults` data.frame has SNP, chromosome, position, and p-value columns named `SNP`, `CHR`, `BP`, and `P`. If you're creating a manhattan plot and your column names are different, you'll have to pass the column names to the `chr=`, `bp=`, `p=`, and `snp=` arguments. See `help(manhattan)` for details.
+* The chromosome column must be numeric. If you have "X," "Y," or "MT" chromosomes, you'll need to rename these 23, 24, 25, etc.
+* If you'd like to change the color of the highlight or the suggestive/genomewide lines, you'll need to modify the source code. Search for `col="blue"`, `col="red"`, or `col="green3"` to modify the suggestive line, genomewide line, and highlight colors, respectively.
+
+## Creating Q-Q plots
+
+Creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. You can optionally provide a title.
+
+```{r}
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+```
+
+
+
+Something wrong? Please file bug reports, feature requests, or anything else related to the code as an issue on GitHub rather than commenting here. Also, please post the code you're using and some example data causing a failure in a publicly accessible place, such as a GitHub gist (no registration required). It's difficult to troubleshoot if I can't see the data where the code is failing. Want to contribute? Awesome! Send me a pull request.
+
+Note: This release is substantially simplified for the sake of maintainability and creating an R package. The old code that allows confidence intervals on the Q-Q plot and allows more flexible annotation and highlighting is still available at the version 0.0.0 release on GitHub.
+
+Here's a shout-out to all the blog commenters on the previous post for pointing out bugs and other issues, and a special thanks to Dan Capurso and Tim Knutsen for useful contributions and bugfixes.
