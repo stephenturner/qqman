@@ -1,6 +1,6 @@
 #' Creates a manhattan plot
 #' 
-#' Creates a manhattan plot from PLINK assoc output (or any data frame with
+#' Creates a manhattan plot from PLINK assoc output (or any data frame with 
 #' chromosome, position, and p-value).
 #' 
 #' @param x A data.frame with columns "BP," "CHR," "P," and optionally, "SNP."
@@ -22,12 +22,16 @@
 #'   -log10(5e-8). Set to FALSE to disable.
 #' @param highlight A character vector of SNPs in your dataset to highlight. 
 #'   These SNPs should all be in your dataset.
+#' @param logp If TRUE, the -log10 of the p-value is plotted. It isn't very
+#'   useful to plot raw p-values, but plotting the raw value could be useful for
+#'   other genome-wide plots, for example, peak heights, bayes factors, test
+#'   statistics, other "scores," etc.
 #' @param ... Arguments passed on to other plot/points functions
 #'   
 #' @return A manhattan plot.
 #'   
 #' @keywords visualization manhattan
-#' 
+#'   
 #' @examples
 #' manhattan(gwasResults)
 #'   
@@ -36,7 +40,7 @@
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP", 
                       col=c("gray10", "gray60"), ymax=NULL, 
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), 
-                      highlight=NULL, ...) {
+                      highlight=NULL, logp=TRUE, ...) {
     
     # Not sure why, but package check will warn without this.
     P=index=NULL
@@ -62,7 +66,12 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # Set positions, ticks, and labels for plotting
     ## Sort, keep only SNPs with p-values between 0 and 1
     d=subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
-    d$logp = -log10(d$P)
+    #d$logp <- ifelse(logp, yes=-log10(d$P), no=d$P)
+    if (logp) {
+        d$logp <- -log10(d$P)
+    } else {
+        d$logp <- d$P
+    }
     d$pos=NA
     
     # Set y maximum. If ymax is undefined, not numeric, or negative, set it
