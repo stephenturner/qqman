@@ -75,10 +75,10 @@ Now, let's make a basic manhattan plot.
 manhattan(gwasResults)
 ```
 
-We can also pass in other graphical parameters. Let's add a title (`main=`), increase the y-axis limit (`ylim=`), reduce the point size to 60% (`cex=`), and reduce the font size of the axis labels to 80% (`cex.axis=`). While we're at it, let's change the colors (`col=`) and remove the suggestive and genome-wide significance lines::
+We can also pass in other graphical parameters. Let's add a title (`main=`), increase the y-axis limit (`ylim=`), reduce the point size to 60% (`cex=`), and reduce the font size of the axis labels to 90% (`cex.axis=`). While we're at it, let's change the colors (`col=`), remove the suggestive and genome-wide significance lines, and supply our own labels for the chromosomes:
 
 ```{r}
-manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.6, cex.axis=0.8, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,10), cex=0.6, cex.axis=0.9, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F, chrlabs=c(1:20, "P", "Q"))
 ```
 
 Now, let's look at a single chromosome:

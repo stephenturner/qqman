@@ -4,8 +4,9 @@
 \title{Creates a manhattan plot}
 \usage{
 manhattan(x, chr = "CHR", bp = "BP", p = "P", snp = "SNP",
-  col = c("gray10", "gray60"), suggestiveline = -log10(1e-05),
-  genomewideline = -log10(5e-08), highlight = NULL, logp = TRUE, ...)
+  col = c("gray10", "gray60"), chrlabs = NULL,
+  suggestiveline = -log10(1e-05), genomewideline = -log10(5e-08),
+  highlight = NULL, logp = TRUE, ...)
 }
 \arguments{
 \item{x}{A data.frame with columns "BP," "CHR," "P," and optionally, "SNP."}
@@ -24,6 +25,9 @@ PLINK's "P." Said column must be numeric.}
 Defaults to PLINK's "SNP." Said column should be a character.}
 
 \item{col}{A character vector indicating which colors to alternate.}
+
+\item{chrlabs}{A character vector equal to the number of chromosomes
+specifying the chromosome labels (e.g., \code{c(1:22, "X", "Y", "MT")}).}
 
 \item{suggestiveline}{Where to draw a "suggestive" line. Default
 -log10(1e-5). Set to FALSE to disable.}

@@ -14,15 +14,17 @@
 #' @param snp A string denoting the column name for the SNP name (rs number). 
 #'   Defaults to PLINK's "SNP." Said column should be a character.
 #' @param col A character vector indicating which colors to alternate.
+#' @param chrlabs A character vector equal to the number of chromosomes
+#'   specifying the chromosome labels (e.g., \code{c(1:22, "X", "Y", "MT")}).
 #' @param suggestiveline Where to draw a "suggestive" line. Default 
 #'   -log10(1e-5). Set to FALSE to disable.
 #' @param genomewideline Where to draw a "genome-wide sigificant" line. Default 
 #'   -log10(5e-8). Set to FALSE to disable.
 #' @param highlight A character vector of SNPs in your dataset to highlight. 
 #'   These SNPs should all be in your dataset.
-#' @param logp If TRUE, the -log10 of the p-value is plotted. It isn't very
+#' @param logp If TRUE, the -log10 of the p-value is plotted. It isn't very 
 #'   useful to plot raw p-values, but plotting the raw value could be useful for
-#'   other genome-wide plots, for example, peak heights, bayes factors, test
+#'   other genome-wide plots, for example, peak heights, bayes factors, test 
 #'   statistics, other "scores," etc.
 #' @param ... Arguments passed on to other plot/points functions
 #'   
@@ -36,12 +38,12 @@
 #' @export
 
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP", 
-                      col=c("gray10", "gray60"),
+                      col=c("gray10", "gray60"), chrlabs=NULL,
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), 
                       highlight=NULL, logp=TRUE, ...) {
     
     # Not sure why, but package check will warn without this.
-    P=index=NULL
+    CHR=BP=P=index=NULL
     
     # Check for sensible dataset
     ## Make sure you have chr, bp and p columns.
@@ -137,7 +139,19 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     ## arguments that were not defined in the ... arguments.
     do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in% names(dotargs)]))
     
-
+    # If manually specifying chromosome labels, ensure a character vector and number of labels matches number chrs.
+    if (!is.null(chrlabs)) {
+        if (is.character(chrlabs)) {
+            if (length(chrlabs)==length(labs)) {
+                labs <- chrlabs
+            } else {
+                warning("You're trying to specify chromosome labels but the number of labels != number of chromosomes.")
+            }
+        } else {
+            warning("If you're trying to specify chromosome labels, chrlabs must be a character vector")
+        }
+    }
+    
     # Add an axis. 
     if (nchr==1) { #If single chromosome, ticks and labels automatic.
         axis(1, ...)

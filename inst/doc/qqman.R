@@ -47,7 +47,7 @@ as.data.frame(table(gwasResults$CHR))
 manhattan(gwasResults)
 
 ## ------------------------------------------------------------------------
-manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.6, cex.axis=0.8, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,10), cex=0.6, cex.axis=0.9, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F, chrlabs=c(1:20, "P", "Q"))
 
 ## ------------------------------------------------------------------------
 manhattan(subset(gwasResults, CHR==1))
