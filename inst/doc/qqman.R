@@ -1,7 +1,7 @@
 ## ----, include=FALSE-----------------------------------------------------
 library(qqman)
 library(knitr)
-opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE, dpi=75)
 
 ## ----generatedata, eval=FALSE, echo=FALSE--------------------------------
 #  # This code used to generate the test data. Runs slow, but does the job.
@@ -47,10 +47,7 @@ as.data.frame(table(gwasResults$CHR))
 manhattan(gwasResults)
 
 ## ------------------------------------------------------------------------
-manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.5, cex.axis=0.8)
-
-## ------------------------------------------------------------------------
-manhattan(gwasResults, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.6, cex.axis=0.8, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
 
 ## ------------------------------------------------------------------------
 manhattan(subset(gwasResults, CHR==1))

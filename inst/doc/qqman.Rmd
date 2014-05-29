@@ -8,14 +8,14 @@ output:
 ---
 
 <!--
-%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Intro to the qqman package}
 -->
 
 ```{r, include=FALSE}
 library(qqman)
 library(knitr)
-opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE, dpi=75)
 ```
 
 # Intro to the **qqman** package
@@ -75,19 +75,13 @@ Now, let's make a basic manhattan plot.
 manhattan(gwasResults)
 ```
 
-We can also pass in other graphical parameters. Let's add a title (`main=`), increase the y-axis limit (`ylim=`), reduce the point size to 50% (`cex=`), and reduce the font size of the axis labels to 80% (`cex.axis=`):
+We can also pass in other graphical parameters. Let's add a title (`main=`), increase the y-axis limit (`ylim=`), reduce the point size to 60% (`cex=`), and reduce the font size of the axis labels to 80% (`cex.axis=`). While we're at it, let's change the colors (`col=`) and remove the suggestive and genome-wide significance lines::
 
 ```{r}
-manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.5, cex.axis=0.8)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.6, cex.axis=0.8, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
 ```
 
-Let's change the colors and remove the suggestive and genome-wide significance lines:
-
-```{r}
-manhattan(gwasResults, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
-```
-
-Let's look at a single chromosome:
+Now, let's look at a single chromosome:
 
 ```{r}
 manhattan(subset(gwasResults, CHR==1))
