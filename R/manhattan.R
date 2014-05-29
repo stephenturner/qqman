@@ -142,6 +142,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
 
     
     # The new way to initialize the plot.
+    ## See http://stackoverflow.com/q/23922130/654296
     ## First, define your default arguments
     def_args <- list(xaxt='n', bty='n', xaxs='i', yaxs='i', las=1, pch=20,
                      xlim=c(xmin,xmax), ylim=c(ymin,ymax),
@@ -154,7 +155,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     ## arguments that were not defined in the ... arguments.
     do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in% names(dotargs)]))
     
-    
+
     # Add an axis. 
     if (nchr==1) { #If single chromosome, ticks and labels automatic.
         axis(1, ...)
