@@ -14,8 +14,6 @@
 #' @param snp A string denoting the column name for the SNP name (rs number). 
 #'   Defaults to PLINK's "SNP." Said column should be a character.
 #' @param col A character vector indicating which colors to alternate.
-#' @param ymax The upper limit to the y-axis. Set automatically based on the 
-#'   most significant SNP unless set here specifically.
 #' @param suggestiveline Where to draw a "suggestive" line. Default 
 #'   -log10(1e-5). Set to FALSE to disable.
 #' @param genomewideline Where to draw a "genome-wide sigificant" line. Default 
@@ -38,7 +36,7 @@
 #' @export
 
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP", 
-                      col=c("gray10", "gray60"), ymax=NULL, 
+                      col=c("gray10", "gray60"),
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), 
                       highlight=NULL, logp=TRUE, ...) {
     
@@ -64,8 +62,10 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     if (!is.null(x[[snp]])) d=transform(d, SNP=x[[snp]])
     
     # Set positions, ticks, and labels for plotting
-    ## Sort, keep only SNPs with p-values between 0 and 1
-    d=subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
+    ## Sort and keep only values where is numeric.
+    #d <- subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
+    d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
+    d <- d[order(d$CHR, d$BP), ]
     #d$logp <- ifelse(logp, yes=-log10(d$P), no=d$P)
     if (logp) {
         d$logp <- -log10(d$P)
@@ -74,22 +74,6 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     }
     d$pos=NA
     
-    # Set y maximum. If ymax is undefined, not numeric, or negative, set it
-    # equal to the most significant SNP.
-    if (is.null(ymax)) { # still null
-        ymax = ceiling(max(d$logp))
-        message("Ymax will be set automatically based on most significant SNP")
-    } else if (!is.numeric(ymax)){  # not numeric
-        ymax = ceiling(max(d$logp))
-        warning('non-numeric ymax argument.')
-    } else if (ymax < 0) { # negative
-        ymax = ceiling(max(d$logp))
-        warning('negative ymax argument.')
-    } else if (is.null(ymax)) { # still null
-        ymax = ceiling(max(d$logp))
-        message(paste("Using", ymax, "as ymax"))
-    }
-    message(paste("Using", ymax, "as ymax"))
     
     # Fixes the bug where one chromosome is missing by adding a sequential index column.
     d$index=NA
@@ -128,13 +112,12 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
         }
         xlabel = 'Chromosome'
         #labs = append(unique(d$CHR),'') ## I forgot what this was here for... if seems to work, remove.
-        labs=unique(d$CHR)
+        labs <- unique(d$CHR)
     }
     
     # Initialize plot
     xmax = ceiling(max(d$pos) * 1.03)
     xmin = floor(max(d$pos) * -0.03)
-    ymin = 0
     
     # The old way to initialize the plot
     # plot(NULL, xaxt='n', bty='n', xaxs='i', yaxs='i', xlim=c(xmin,xmax), ylim=c(ymin,ymax),
@@ -145,12 +128,11 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     ## See http://stackoverflow.com/q/23922130/654296
     ## First, define your default arguments
     def_args <- list(xaxt='n', bty='n', xaxs='i', yaxs='i', las=1, pch=20,
-                     xlim=c(xmin,xmax), ylim=c(ymin,ymax),
+                     xlim=c(xmin,xmax), ylim=c(0,ceiling(max(d$logp))),
                      xlab=xlabel, ylab=expression(-log[10](italic(p))))
     ## Next, get a list of ... arguments
-    #myargs <- as.list(match.call())[-1L]
+    #dotargs <- as.list(match.call())[-1L]
     dotargs <- list(...)
-    print(dotargs)
     ## And call the plot function passing NA, your ... arguments, and the default
     ## arguments that were not defined in the ... arguments.
     do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in% names(dotargs)]))
