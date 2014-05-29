@@ -135,8 +135,25 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     xmax = ceiling(max(d$pos) * 1.03)
     xmin = floor(max(d$pos) * -0.03)
     ymin = 0
-    plot(NULL, xaxt='n', bty='n', xaxs='i', yaxs='i', xlim=c(xmin,xmax), ylim=c(ymin,ymax),
-         xlab=xlabel, ylab=expression(-log[10](italic(p))), las=1, pch=20, ...)
+    
+    # The old way to initialize the plot
+    # plot(NULL, xaxt='n', bty='n', xaxs='i', yaxs='i', xlim=c(xmin,xmax), ylim=c(ymin,ymax),
+    #      xlab=xlabel, ylab=expression(-log[10](italic(p))), las=1, pch=20, ...)
+
+    
+    # The new way to initialize the plot.
+    ## First, define your default arguments
+    def_args <- list(xaxt='n', bty='n', xaxs='i', yaxs='i', las=1, pch=20,
+                     xlim=c(xmin,xmax), ylim=c(ymin,ymax),
+                     xlab=xlabel, ylab=expression(-log[10](italic(p))))
+    ## Next, get a list of ... arguments
+    #myargs <- as.list(match.call())[-1L]
+    dotargs <- list(...)
+    print(dotargs)
+    ## And call the plot function passing NA, your ... arguments, and the default
+    ## arguments that were not defined in the ... arguments.
+    do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in% names(dotargs)]))
+    
     
     # Add an axis. 
     if (nchr==1) { #If single chromosome, ticks and labels automatic.
