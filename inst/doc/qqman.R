@@ -47,24 +47,29 @@ as.data.frame(table(gwasResults$CHR))
 manhattan(gwasResults)
 
 ## ------------------------------------------------------------------------
-manhattan(gwasResults, main="Manhattan Plot", cex=0.5, cex.axis=0.8)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,12), cex=0.5, cex.axis=0.8)
 
-## --------------------------------------------------------------------------------------------------------
-manhattan(gwasResults, col=c("blue4", "orange3"), ymax=12)
+## ------------------------------------------------------------------------
+manhattan(gwasResults, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F)
 
-## --------------------------------------------------------------------------------------------------------
-manhattan(gwasResults, suggestiveline=F, genomewideline=F)
-
-## --------------------------------------------------------------------------------------------------------
+## ------------------------------------------------------------------------
 manhattan(subset(gwasResults, CHR==1))
 
-## --------------------------------------------------------------------------------------------------------
+## ------------------------------------------------------------------------
 str(snpsOfInterest)
 manhattan(gwasResults, highlight=snpsOfInterest)
 
-## --------------------------------------------------------------------------------------------------------
-manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, main="Chr 3")
+## ------------------------------------------------------------------------
+manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, xlim=c(200, 500), main="Chr 3")
 
-## --------------------------------------------------------------------------------------------------------
+## ------------------------------------------------------------------------
+# Add test statistics
+gwasResults <- transform(gwasResults, zscore=qnorm(P/2, lower.tail=FALSE))
+head(gwasResults)
+
+# Make the new plot
+manhattan(gwasResults, p="zscore", logp=FALSE, ylab="Z-score", genomewideline=FALSE, suggestiveline=FALSE, main="Manhattan plot of Z-scores")
+
+## ------------------------------------------------------------------------
 qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
 
