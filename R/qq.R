@@ -30,7 +30,7 @@ qq = function(pvector, ...) {
     plot(e, o, pch=20, 
          xlab=expression(Expected~~-log[10](italic(p))), 
          ylab=expression(Observed~~-log[10](italic(p))), 
-         xlim=c(0,max(e)), ...)
+         ...)
     
     # Add diagonal
     abline(0,1,col="red")
