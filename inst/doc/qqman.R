@@ -68,5 +68,9 @@ head(gwasResults)
 manhattan(gwasResults, p="zscore", logp=FALSE, ylab="Z-score", genomewideline=FALSE, suggestiveline=FALSE, main="Manhattan plot of Z-scores")
 
 ## ------------------------------------------------------------------------
-qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+qq(gwasResults$P)
+
+## ------------------------------------------------------------------------
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values",
+   xlim=c(0,7), ylim=c(0,12), pch=18, col="blue4", cex=1.5, las=1)
 

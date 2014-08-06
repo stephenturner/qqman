@@ -119,8 +119,15 @@ A few notes on creating manhattan plots:
 
 ## Creating Q-Q plots
 
-Creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. You can optionally provide a title.
+Creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. 
 
 ```{r}
-qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+qq(gwasResults$P)
+```
+
+We can otionally supply many other graphical parameters.
+
+```{r}
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values",
+   xlim=c(0,7), ylim=c(0,12), pch=18, col="blue4", cex=1.5, las=1)
 ```
