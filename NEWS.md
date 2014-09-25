@@ -1,6 +1,7 @@
 # qqman 0.1.2
 
 * Does not assume that SNPs are evenly distributed across chromosomes when deciding where to place the tick in the center of the chromosome.
+* Changed single chromosome x-axis notation to use Mb instead of raw pos
 * `qq()` accepts graphical parameters the same way as `manhattan()`
 * Removed default `xlim`
 * Citation details on package load
