@@ -1,5 +1,7 @@
 # qqman: An R package for creating Q-Q and manhattan plots from GWAS results.
 
+![qqman.gif](assets/qqman.gif)
+
 ## Citation
 
 If you'd like to cite qqman (appreciated but not required), please cite the pre-print below:
@@ -11,21 +13,26 @@ Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manh
 Install the stable release from CRAN:
 
 ```coffee
-# Install once
 install.packages("qqman")
-
-# Load each time you use it
-library(qqman)
 ```
 
-Install the most recent development release with devtools (note, there be dragons here):
+Or install directly from github using devtools
 
 ```coffee
-# Install once with devtools
 library(devtools)
 install_github("stephenturner/qqman")
+```
 
-# Load
+Or install the most recent development release with devtools (note, there be dragons here):
+
+```coffee
+library(devtools)
+install_github("stephenturner/qqman", ref="dev")
+```
+
+Load the package each time you use it:
+
+```coffee
 library(qqman)
 ```
 

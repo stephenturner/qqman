@@ -14,17 +14,17 @@
 #' @param snp A string denoting the column name for the SNP name (rs number). 
 #'   Defaults to PLINK's "SNP." Said column should be a character.
 #' @param col A character vector indicating which colors to alternate.
-#' @param ymax The upper limit to the y-axis. Set automatically based on the 
-#'   most significant SNP unless set here specifically.
+#' @param chrlabs A character vector equal to the number of chromosomes
+#'   specifying the chromosome labels (e.g., \code{c(1:22, "X", "Y", "MT")}).
 #' @param suggestiveline Where to draw a "suggestive" line. Default 
 #'   -log10(1e-5). Set to FALSE to disable.
 #' @param genomewideline Where to draw a "genome-wide sigificant" line. Default 
 #'   -log10(5e-8). Set to FALSE to disable.
 #' @param highlight A character vector of SNPs in your dataset to highlight. 
 #'   These SNPs should all be in your dataset.
-#' @param logp If TRUE, the -log10 of the p-value is plotted. It isn't very
+#' @param logp If TRUE, the -log10 of the p-value is plotted. It isn't very 
 #'   useful to plot raw p-values, but plotting the raw value could be useful for
-#'   other genome-wide plots, for example, peak heights, bayes factors, test
+#'   other genome-wide plots, for example, peak heights, bayes factors, test 
 #'   statistics, other "scores," etc.
 #' @param ... Arguments passed on to other plot/points functions
 #'   
@@ -38,12 +38,12 @@
 #' @export
 
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP", 
-                      col=c("gray10", "gray60"), ymax=NULL, 
+                      col=c("gray10", "gray60"), chrlabs=NULL,
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), 
                       highlight=NULL, logp=TRUE, ...) {
     
     # Not sure why, but package check will warn without this.
-    P=index=NULL
+    CHR=BP=P=index=NULL
     
     # Check for sensible dataset
     ## Make sure you have chr, bp and p columns.
@@ -64,8 +64,10 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     if (!is.null(x[[snp]])) d=transform(d, SNP=x[[snp]])
     
     # Set positions, ticks, and labels for plotting
-    ## Sort, keep only SNPs with p-values between 0 and 1
-    d=subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
+    ## Sort and keep only values where is numeric.
+    #d <- subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
+    d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
+    d <- d[order(d$CHR, d$BP), ]
     #d$logp <- ifelse(logp, yes=-log10(d$P), no=d$P)
     if (logp) {
         d$logp <- -log10(d$P)
@@ -74,22 +76,6 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     }
     d$pos=NA
     
-    # Set y maximum. If ymax is undefined, not numeric, or negative, set it
-    # equal to the most significant SNP.
-    if (is.null(ymax)) { # still null
-        ymax = ceiling(max(d$logp))
-        message("Ymax will be set automatically based on most significant SNP")
-    } else if (!is.numeric(ymax)){  # not numeric
-        ymax = ceiling(max(d$logp))
-        warning('non-numeric ymax argument.')
-    } else if (ymax < 0) { # negative
-        ymax = ceiling(max(d$logp))
-        warning('negative ymax argument.')
-    } else if (is.null(ymax)) { # still null
-        ymax = ceiling(max(d$logp))
-        message(paste("Using", ymax, "as ymax"))
-    }
-    message(paste("Using", ymax, "as ymax"))
     
     # Fixes the bug where one chromosome is missing by adding a sequential index column.
     d$index=NA
@@ -110,9 +96,10 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # 3   1  5
     nchr = length(unique(d$CHR))
     if (nchr==1) { ## For a single chromosome
-        d$pos=d$BP
+        options(scipen=999)
+	d$pos=d$BP/1e6
         ticks=floor(length(d$pos))/2+1
-        xlabel = paste('Chromosome',unique(d$CHR),'position')
+        xlabel = paste('Chromosome',unique(d$CHR),'position(Mb)')
         labs = ticks
     } else { ## For multiple chromosomes
         lastbase=0
@@ -124,19 +111,50 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
                 lastbase=lastbase+tail(subset(d,index==i-1)$BP, 1)
                 d[d$index==i, ]$pos=d[d$index==i, ]$BP+lastbase
             }
-            ticks=c(ticks, d[d$index==i, ]$pos[floor(length(d[d$index==i, ]$pos)/2)+1])
+            # Old way: assumes SNPs evenly distributed
+            # ticks=c(ticks, d[d$index==i, ]$pos[floor(length(d[d$index==i, ]$pos)/2)+1])
+            # New way: doesn't make that assumption
+            ticks = c(ticks, (min(d[d$CHR == i,]$pos) + max(d[d$CHR == i,]$pos))/2 + 1)
         }
         xlabel = 'Chromosome'
         #labs = append(unique(d$CHR),'') ## I forgot what this was here for... if seems to work, remove.
-        labs=unique(d$CHR)
+        labs <- unique(d$CHR)
     }
     
     # Initialize plot
     xmax = ceiling(max(d$pos) * 1.03)
     xmin = floor(max(d$pos) * -0.03)
-    ymin = 0
-    plot(NULL, xaxt='n', bty='n', xaxs='i', yaxs='i', xlim=c(xmin,xmax), ylim=c(ymin,ymax),
-         xlab=xlabel, ylab=expression(-log[10](italic(p))), las=1, pch=20, ...)
+    
+    # The old way to initialize the plot
+    # plot(NULL, xaxt='n', bty='n', xaxs='i', yaxs='i', xlim=c(xmin,xmax), ylim=c(ymin,ymax),
+    #      xlab=xlabel, ylab=expression(-log[10](italic(p))), las=1, pch=20, ...)
+
+    
+    # The new way to initialize the plot.
+    ## See http://stackoverflow.com/q/23922130/654296
+    ## First, define your default arguments
+    def_args <- list(xaxt='n', bty='n', xaxs='i', yaxs='i', las=1, pch=20,
+                     xlim=c(xmin,xmax), ylim=c(0,ceiling(max(d$logp))),
+                     xlab=xlabel, ylab=expression(-log[10](italic(p))))
+    ## Next, get a list of ... arguments
+    #dotargs <- as.list(match.call())[-1L]
+    dotargs <- list(...)
+    ## And call the plot function passing NA, your ... arguments, and the default
+    ## arguments that were not defined in the ... arguments.
+    do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in% names(dotargs)]))
+    
+    # If manually specifying chromosome labels, ensure a character vector and number of labels matches number chrs.
+    if (!is.null(chrlabs)) {
+        if (is.character(chrlabs)) {
+            if (length(chrlabs)==length(labs)) {
+                labs <- chrlabs
+            } else {
+                warning("You're trying to specify chromosome labels but the number of labels != number of chromosomes.")
+            }
+        } else {
+            warning("If you're trying to specify chromosome labels, chrlabs must be a character vector")
+        }
+    }
     
     # Add an axis. 
     if (nchr==1) { #If single chromosome, ticks and labels automatic.
@@ -150,7 +168,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
 
     # Add points to the plot
     if (nchr==1) {
-        with(d, points(pos, logp, pch=20, ...))
+        with(d, points(pos, logp, pch=20, col=col[1], ...))
     } else {
         # if multiple chromosomes, need to alternate colors and increase the color index (icol) each chr.
         icol=1

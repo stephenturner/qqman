@@ -8,14 +8,14 @@ output:
 ---
 
 <!--
-%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Intro to the qqman package}
 -->
 
 ```{r, include=FALSE}
 library(qqman)
 library(knitr)
-opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE, dpi=75)
 ```
 
 # Intro to the **qqman** package
@@ -75,25 +75,13 @@ Now, let's make a basic manhattan plot.
 manhattan(gwasResults)
 ```
 
-We can also pass in other graphical parameters. Let's add a title (`main=`), reduce the point size to 50%(`cex=`), and reduce the font size of the axis labels to 80% (`cex.axis=`):
+We can also pass in other graphical parameters. Let's add a title (`main=`), increase the y-axis limit (`ylim=`), reduce the point size to 60% (`cex=`), and reduce the font size of the axis labels to 90% (`cex.axis=`). While we're at it, let's change the colors (`col=`), remove the suggestive and genome-wide significance lines, and supply our own labels for the chromosomes:
 
 ```{r}
-manhattan(gwasResults, main="Manhattan Plot", cex=0.5, cex.axis=0.8)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,10), cex=0.6, cex.axis=0.9, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F, chrlabs=c(1:20, "P", "Q"))
 ```
 
-Let's change the colors and increase the maximum y-axis:
-
-```{r}
-manhattan(gwasResults, col=c("blue4", "orange3"), ymax=12)
-```
-
-Let's remove the suggestive and genome-wide significance lines:
-
-```{r}
-manhattan(gwasResults, suggestiveline=F, genomewideline=F)
-```
-
-Let's look at a single chromosome:
+Now, let's look at a single chromosome:
 
 ```{r}
 manhattan(subset(gwasResults, CHR==1))
@@ -106,22 +94,40 @@ str(snpsOfInterest)
 manhattan(gwasResults, highlight=snpsOfInterest)
 ```
 
-We can combine highlighting and limiting to a single chromosome:
+We can combine highlighting and limiting to a single chromosome, and use the `xlim` graphical parameter to zoom in on a region of interest (between position 200-500):
 
 ```{r}
-manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, main="Chr 3")
+manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, xlim=c(200, 500), main="Chr 3")
+```
+
+Finally, the `manhattan` function can be used to plot any value, not just p-values. Here, we'll simply call the function passing to the `p=` argument the name of the column we want to plot instead of the default "P" column. In this example, let's create a test statistic ("zscore"), plot that instead of p-values, change the y-axis label, and remove the default log transformation. We'll also remove the genomewide and suggestive lines because these are only meaningful if you're plotting -log10(p-values).
+
+```{r}
+# Add test statistics
+gwasResults <- transform(gwasResults, zscore=qnorm(P/2, lower.tail=FALSE))
+head(gwasResults)
+
+# Make the new plot
+manhattan(gwasResults, p="zscore", logp=FALSE, ylab="Z-score", genomewideline=FALSE, suggestiveline=FALSE, main="Manhattan plot of Z-scores")
 ```
 
 A few notes on creating manhattan plots:
 
 * Run `str(gwasResults)`. Notice that the `gwasResults` data.frame has SNP, chromosome, position, and p-value columns named `SNP`, `CHR`, `BP`, and `P`. If you're creating a manhattan plot and your column names are different, you'll have to pass the column names to the `chr=`, `bp=`, `p=`, and `snp=` arguments. See `help(manhattan)` for details.
-* The chromosome column must be numeric. If you have "X," "Y," or "MT" chromosomes, you'll need to rename these 23, 24, 25, etc.
+* The chromosome column must be numeric. If you have "X," "Y," or "MT" chromosomes, you'll need to rename these 23, 24, 25, etc. You can modify the source code (e.g., `fix(manhattan)`) to change the line designating the axis tick labels (`labs <- unique(d$CHR)`) to set this to whatever you'd like it to be.
 * If you'd like to change the color of the highlight or the suggestive/genomewide lines, you'll need to modify the source code. Search for `col="blue"`, `col="red"`, or `col="green3"` to modify the suggestive line, genomewide line, and highlight colors, respectively.
 
 ## Creating Q-Q plots
 
-Creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. You can optionally provide a title.
+Creating Q-Q plots is straightforward - simply supply a vector of p-values to the `qq()` function. 
 
 ```{r}
-qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+qq(gwasResults$P)
+```
+
+We can otionally supply many other graphical parameters.
+
+```{r}
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values",
+   xlim=c(0,7), ylim=c(0,12), pch=18, col="blue4", cex=1.5, las=1)
 ```

@@ -1,7 +1,7 @@
 ## ----, include=FALSE-----------------------------------------------------
 library(qqman)
 library(knitr)
-opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE)
+opts_chunk$set(comment=NA, fig.width=12, fig.height=9, message=FALSE, tidy=TRUE, dpi=75)
 
 ## ----generatedata, eval=FALSE, echo=FALSE--------------------------------
 #  # This code used to generate the test data. Runs slow, but does the job.
@@ -47,24 +47,30 @@ as.data.frame(table(gwasResults$CHR))
 manhattan(gwasResults)
 
 ## ------------------------------------------------------------------------
-manhattan(gwasResults, main="Manhattan Plot", cex=0.5, cex.axis=0.8)
+manhattan(gwasResults, main="Manhattan Plot", ylim=c(0,10), cex=0.6, cex.axis=0.9, col=c("blue4", "orange3"), suggestiveline=F, genomewideline=F, chrlabs=c(1:20, "P", "Q"))
 
-## --------------------------------------------------------------------------------------------------------
-manhattan(gwasResults, col=c("blue4", "orange3"), ymax=12)
-
-## --------------------------------------------------------------------------------------------------------
-manhattan(gwasResults, suggestiveline=F, genomewideline=F)
-
-## --------------------------------------------------------------------------------------------------------
+## ------------------------------------------------------------------------
 manhattan(subset(gwasResults, CHR==1))
 
-## --------------------------------------------------------------------------------------------------------
+## ------------------------------------------------------------------------
 str(snpsOfInterest)
 manhattan(gwasResults, highlight=snpsOfInterest)
 
-## --------------------------------------------------------------------------------------------------------
-manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, main="Chr 3")
+## ------------------------------------------------------------------------
+manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, xlim=c(200, 500), main="Chr 3")
 
-## --------------------------------------------------------------------------------------------------------
-qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
+## ------------------------------------------------------------------------
+# Add test statistics
+gwasResults <- transform(gwasResults, zscore=qnorm(P/2, lower.tail=FALSE))
+head(gwasResults)
+
+# Make the new plot
+manhattan(gwasResults, p="zscore", logp=FALSE, ylab="Z-score", genomewideline=FALSE, suggestiveline=FALSE, main="Manhattan plot of Z-scores")
+
+## ------------------------------------------------------------------------
+qq(gwasResults$P)
+
+## ------------------------------------------------------------------------
+qq(gwasResults$P, main="Q-Q plot of GWAS p-values",
+   xlim=c(0,7), ylim=c(0,12), pch=18, col="blue4", cex=1.5, las=1)
 
