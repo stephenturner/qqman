@@ -96,9 +96,10 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # 3   1  5
     nchr = length(unique(d$CHR))
     if (nchr==1) { ## For a single chromosome
-        d$pos=d$BP
+        options(scipen=999)
+	d$pos=d$BP/1e6
         ticks=floor(length(d$pos))/2+1
-        xlabel = paste('Chromosome',unique(d$CHR),'position')
+        xlabel = paste('Chromosome',unique(d$CHR),'position(Mb)')
         labs = ticks
     } else { ## For multiple chromosomes
         lastbase=0
@@ -167,7 +168,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
 
     # Add points to the plot
     if (nchr==1) {
-        with(d, points(pos, logp, pch=20, ...))
+        with(d, points(pos, logp, pch=20, col=col[1], ...))
     } else {
         # if multiple chromosomes, need to alternate colors and increase the color index (icol) each chr.
         icol=1
