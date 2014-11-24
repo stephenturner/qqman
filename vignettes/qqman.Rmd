@@ -100,6 +100,18 @@ We can combine highlighting and limiting to a single chromosome, and use the `xl
 manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, xlim=c(200, 500), main="Chr 3")
 ```
 
+We can also annotate SNPs based on their p-value. By default, this only annotates the top SNP per chromosome that exceeds the `annotatePval` threshold.
+
+```{r}
+manhattan(gwasResults, annotatePval=0.01)
+```
+
+We can also annotate all SNPs that meet a threshold:
+
+```{r}
+manhattan(gwasResults, annotatePval=0.005, annotateTop=FALSE)
+```
+
 Finally, the `manhattan` function can be used to plot any value, not just p-values. Here, we'll simply call the function passing to the `p=` argument the name of the column we want to plot instead of the default "P" column. In this example, let's create a test statistic ("zscore"), plot that instead of p-values, change the y-axis label, and remove the default log transformation. We'll also remove the genomewide and suggestive lines because these are only meaningful if you're plotting -log10(p-values).
 
 ```{r}
