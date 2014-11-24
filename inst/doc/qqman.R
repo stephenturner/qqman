@@ -60,6 +60,12 @@ manhattan(gwasResults, highlight=snpsOfInterest)
 manhattan(subset(gwasResults, CHR==3), highlight=snpsOfInterest, xlim=c(200, 500), main="Chr 3")
 
 ## ------------------------------------------------------------------------
+manhattan(gwasResults, annotatePval=0.01)
+
+## ------------------------------------------------------------------------
+manhattan(gwasResults, annotatePval=0.005, annotateTop=FALSE)
+
+## ------------------------------------------------------------------------
 # Add test statistics
 gwasResults <- transform(gwasResults, zscore=qnorm(P/2, lower.tail=FALSE))
 head(gwasResults)
