@@ -98,10 +98,12 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # 3   1  5
     nchr = length(unique(d$CHR))
     if (nchr==1) { ## For a single chromosome
-        options(scipen=999)
-	d$pos=d$BP/1e6
+        ## Uncomment the next two linex to plot single chr results in Mb
+        #options(scipen=999)
+	    #d$pos=d$BP/1e6
+        d$pos=d$BP
         ticks=floor(length(d$pos))/2+1
-        xlabel = paste('Chromosome',unique(d$CHR),'position(Mb)')
+        xlabel = paste('Chromosome',unique(d$CHR),'position')
         labs = ticks
     } else { ## For multiple chromosomes
         lastbase=0
