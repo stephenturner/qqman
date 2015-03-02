@@ -1,11 +1,13 @@
 Package: qqman
 Title: Q-Q and manhattan plots for GWAS data
-Version: 0.1.2
+Version: 0.1.3
 Author: Stephen Turner <vustephen@gmail.com>
 Maintainer: Stephen Turner <vustephen@gmail.com>
 Description: Q-Q and manhattan plots for GWAS data
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.0.0),
+Imports:
+    calibrate
 Suggests:
     knitr
 License: GPL-3

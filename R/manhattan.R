@@ -37,13 +37,15 @@
 #' @examples
 #' manhattan(gwasResults)
 #'   
+#' @importFrom calibrate textxy  
+#'   
 #' @export
 
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP", 
                       col=c("gray10", "gray60"), chrlabs=NULL,
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8), 
                       highlight=NULL, logp=TRUE, annotatePval = NULL, annotateTop = TRUE, ...) {
-    
+
     # Not sure why, but package check will warn without this.
     CHR=BP=P=index=NULL
     

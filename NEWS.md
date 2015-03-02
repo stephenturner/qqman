@@ -1,3 +1,8 @@
+# qqman 0.1.3
+
+* Annotate SNPs below a p-value threshold with the `annotatePval=` option. See vignette for details.
+* Annotate the top SNP on each chromosome with the `annotateTop=` option. See vignette for details.
+
 # qqman 0.1.2
 
 * Does not assume that SNPs are evenly distributed across chromosomes when deciding where to place the tick in the center of the chromosome.
