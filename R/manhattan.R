@@ -114,7 +114,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
             # Old way: assumes SNPs evenly distributed
             # ticks=c(ticks, d[d$index==i, ]$pos[floor(length(d[d$index==i, ]$pos)/2)+1])
             # New way: doesn't make that assumption
-            ticks = c(ticks, (min(d[d$CHR == i,]$pos) + max(d[d$CHR == i,]$pos))/2 + 1)
+            ticks = c(ticks, (min(d[d$index == i,]$pos) + max(d[d$index == i,]$pos))/2 + 1)
         }
         xlabel = 'Chromosome'
         #labs = append(unique(d$CHR),'') ## I forgot what this was here for... if seems to work, remove.
