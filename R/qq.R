@@ -2,7 +2,14 @@
 #' 
 #' Creates a quantile-quantile plot from p-values from a GWAS study.
 #' 
-#' @param pvector A numeric vector of p-values.
+#' @param x A numeric vector of p-values OR a data.frame with columns "BP," "CHR," "P," and optionally, "SNP."
+#' @param p A string denoting the column name for the p-value. Defaults to 
+#'   PLINK's "P." Said column must be numeric.
+#' @param snp A string denoting the column name for the SNP name (rs number). 
+#'   Defaults to PLINK's "SNP." Said column should be a character.
+#' @param highlight A character vector of SNPs in your dataset to highlight. 
+#'   These SNPs should all be in your dataset.
+#' @param col A character vector indicating which colors to alternate.
 #' @param ... Other arguments passed to \code{plot()}
 #' 
 #' @return A Q-Q plot.
@@ -14,19 +21,38 @@
 #' 
 #' @export
 
-qq = function(pvector, ...) {
+qq = function(x, p="P", snp="SNP", highlight=NULL, col="black", ...) {
     
     # Check for sensible input
-    if (!is.numeric(pvector)) stop("Input must be numeric.")
-    
-    # limit to not missing, not nan, not null, not infinite, between 0 and 1
-    pvector <- pvector[!is.na(pvector) & !is.nan(pvector) & !is.null(pvector) & is.finite(pvector) & pvector<1 & pvector>0]
-    
-    # Observed and expected
-    o = -log10(sort(pvector,decreasing=FALSE))
-    e = -log10( ppoints(length(pvector) ))
-    
-    
+    if (is.numeric(x)) {
+	# convert to data.frame
+	x=data.frame(snp=NA,p=x)
+	names(x)=c(snp,p)
+    } else if (is.data.frame(x)) {
+        if (!(p %in% names(x))) stop(paste("Column", p, "not found!"))
+    	if (!(snp %in% names(x))) warning(paste("No SNP column found. OK unless you're trying to highlight."))
+    } else {
+	stop("Input must be numeric or a gwasResults data.frame.")
+    }
+
+    # Create a new data.frame with columns called SNP (if available) and P,
+    # limited to not missing, not nan, not null, not infinite, between 0 and 1
+    d <- x[!is.na(x[[p]]) & !is.nan(x[[p]]) & !is.null(x[[p]]) & is.finite(x[[p]]) & x[[p]]<1 & x[[p]]>0,which(names(x) %in% c(snp,p))]
+    # Order ascending by p-value
+    d <- d[order(d[[p]]),]
+    d$o = -log10(d[[p]])
+    d$e = -log10( ppoints(nrow(d) ))
+
+    # Highlight snps from a character vector
+    if (!is.null(highlight)) {
+        if (any(!(highlight %in% d$SNP))) warning("You're trying to highlight SNPs that don't exist in your results.")
+        d.highlight=d$SNP %in% highlight
+    } else {
+        d.highlight = rep(F, nrow(d))
+    }
+
+    attach(d)
+
 #     # The old way
 #     plot(e, o, pch=20, 
 #          xlab=expression(Expected~~-log[10](italic(p))), 
@@ -37,6 +63,7 @@ qq = function(pvector, ...) {
     ## See http://stackoverflow.com/q/23922130/654296
     ## First, define your default arguments
     def_args <- list(pch=20, xlim=c(0, max(e)), ylim=c(0, max(o)), 
+		     col=ifelse(d.highlight,"green3", col),
                      xlab=expression(Expected~~-log[10](italic(p))), 
                      ylab=expression(Observed~~-log[10](italic(p)))
     )
@@ -47,7 +74,8 @@ qq = function(pvector, ...) {
     ## arguments that were not defined in the ... arguments.
     tryCatch(do.call("plot", c(list(x=e, y=o), def_args[!names(def_args) %in% names(dotargs)], dotargs)), warn=stop)
 
+    detach(d)
+
     # Add diagonal
     abline(0,1,col="red")
-    
 }
