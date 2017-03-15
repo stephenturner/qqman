@@ -9,6 +9,10 @@
 #' 
 #' @keywords visualization qq qqplot
 #' 
+#' @importFrom stats ppoints
+#' @import utils
+#' @import graphics
+#' 
 #' @examples
 #' qq(gwasResults$P)
 #' 

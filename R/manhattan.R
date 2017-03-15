@@ -34,6 +34,9 @@
 #'   
 #' @keywords visualization manhattan
 #'   
+#' @import utils
+#' @import graphics
+#' 
 #' @examples
 #' manhattan(gwasResults)
 #'   
