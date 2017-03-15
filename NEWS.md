@@ -1,3 +1,7 @@
+# qqman 0.1.4
+
+* Minor fix to location to referenced image for pandoc self-contained README.html generation. 
+
 # qqman 0.1.3
 
 * Annotate SNPs below a p-value threshold with the `annotatePval=` option. See vignette for details.

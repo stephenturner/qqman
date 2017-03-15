@@ -2,7 +2,7 @@
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/qqman)](http://cran.r-project.org/package=qqman)
 
-![qqman.gif](assets/qqman.gif)
+![qqman.gif](tools/qqman.gif)
 
 ## Citation
 
