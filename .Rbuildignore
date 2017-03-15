@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 LICENSE
-NEWS.md
 misc/
 assets/
 cran-comments.md
