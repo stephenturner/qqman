@@ -122,8 +122,9 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
                 d[d$index==i, ]$pos=d[d$index==i, ]$BP
             } else {
 		## chromosome position maybe not start at 1, eg. 9999. So gaps may be produced. 
-		lastbase = lastbase +max(d[d$index==(i-1),"BP"])   # replace line 127
-		d[d$index == i, ]$pos = d[d$index == i,"BP"]-min(d[d$index==i,"BP"]) +1 + lastbase    # replace line 128
+		lastbase = lastbase +max(d[d$index==(i-1),"BP"])   # replace line 128
+		d[d$index == i,"BP"] = d[d$index == i,"BP"]-min(d[d$index==i,"BP"]) +1
+		d[d$index == i, ]$pos = d[d$index == i,"BP"] + lastbase    # replace line 129
                 # lastbase=lastbase+tail(subset(d,index==i-1)$BP, 1)
                 # d[d$index==i, ]$pos=d[d$index==i, ]$BP+lastbase
 		   
@@ -133,7 +134,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
             # New way: doesn't make that assumption
            # ticks = c(ticks, (min(d[d$index == i,]$pos) + max(d[d$index == i,]$pos))/2 + 1)  # see line 136, to reduce the burden of for loop 
         }
-	ticks <-tapply(d$pos,d$index,quantile,probs=0.5)   # replace line 134
+	ticks <-tapply(d$pos,d$index,quantile,probs=0.5)   # replace line 135
         xlabel = 'Chromosome'
         #labs = append(unique(d$CHR),'') ## I forgot what this was here for... if seems to work, remove.
         labs <- unique(d$CHR)
@@ -182,7 +183,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     }
     
     # Create a vector of alternatiting colors
-    #col=rep(col, max(d$CHR))  # replaced by line 186
+    #col=rep(col, max(d$CHR))  # replaced by line 187
     col = rep_len(col, max(d$index))  ## mean this one?  the results are same
 
     # Add points to the plot
