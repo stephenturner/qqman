@@ -69,7 +69,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
 	                                                         #  rather than dynamically allocated(see line 72-73, and remove line 87 and line 91 )
     
     # If the input data frame has a SNP column, add it to the new data frame you're creating.
-    if (!is.null(x[[snp]])) d = data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA ,SNP=x[[snp]]) esle 
+    if (!is.null(x[[snp]])) d = data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA ,SNP=x[[snp]], stringsAsFactors = FALSE) else 
 	    d = data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA)
 	    
     
@@ -124,7 +124,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
 		## chromosome position maybe not start at 1, eg. 9999. So gaps may be produced. 
 		lastbase = lastbase +max(d[d$index==(i-1),"BP"])   # replace line 128
 		d[d$index == i,"BP"] = d[d$index == i,"BP"]-min(d[d$index==i,"BP"]) +1
-		d[d$index == i, ]$pos = d[d$index == i,"BP"] + lastbase    # replace line 129
+		d[d$index == i, "pos"] = d[d$index == i,"BP"] + lastbase    # replace line 129
                 # lastbase=lastbase+tail(subset(d,index==i-1)$BP, 1)
                 # d[d$index==i, ]$pos=d[d$index==i, ]$BP+lastbase
 		   
@@ -193,7 +193,8 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
         # if multiple chromosomes, need to alternate colors and increase the color index (icol) each chr.
         icol=1
         for (i in unique(d$index)) {
-            with(d[d$index==unique(d$index)[i], ], points(pos, logp, col=col[icol], pch=20, ...))
+            #with(d[d$index==unique(d$index)[i], ], points(pos, logp, col=col[icol], pch=20, ...))
+	    points(d[d$index==i,"pos"], d[d$index==i,"logp"], col=col[icol], pch=20, ...)
             icol=icol+1
         }
     }
