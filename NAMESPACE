@@ -3,6 +3,7 @@
 export(manhattan)
 export(qq)
 import(graphics)
+import(stats)
 import(utils)
 importFrom(calibrate,textxy)
 importFrom(stats,ppoints)

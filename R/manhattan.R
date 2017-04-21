@@ -36,6 +36,7 @@
 #'   
 #' @import utils
 #' @import graphics
+#' @import stats
 #' 
 #' @examples
 #' manhattan(gwasResults)
