@@ -1,3 +1,7 @@
+# qqman 0.1.5
+
+* Optimizations thanks to [XikunHan](https://github.com/XikunHan).
+
 # qqman 0.1.4
 
 * Minor fix to location to referenced image for pandoc self-contained README.html generation. 
