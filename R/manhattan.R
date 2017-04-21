@@ -65,15 +65,18 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     if (!is.numeric(x[[p]])) stop(paste(p, "column should be numeric."))
     
     # Create a new data.frame with columns called CHR, BP, and P.
-    d=data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]])
+    # d=data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA) # with millions of SNPs, create dataframe at once 
+	                                                         #  rather than dynamically allocated(see line 72-73, and remove line 87 and line 91 )
     
     # If the input data frame has a SNP column, add it to the new data frame you're creating.
-    if (!is.null(x[[snp]])) d=transform(d, SNP=x[[snp]])
+    if (!is.null(x[[snp]])) d = data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA ,SNP=x[[snp]], stringsAsFactors = FALSE) else 
+	    d = data.frame(CHR=x[[chr]], BP=x[[bp]], P=x[[p]], pos = NA, index = NA)
+	    
     
     # Set positions, ticks, and labels for plotting
     ## Sort and keep only values where is numeric.
     #d <- subset(d[order(d$CHR, d$BP), ], (P>0 & P<=1 & is.numeric(P)))
-    d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
+    #  d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))       ## unused, all three variables are numeric, line:63-65 
     d <- d[order(d$CHR, d$BP), ]
     #d$logp <- ifelse(logp, yes=-log10(d$P), no=d$P)
     if (logp) {
@@ -81,16 +84,17 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     } else {
         d$logp <- d$P
     }
-    d$pos=NA
+   # d$pos=NA
     
     
     # Fixes the bug where one chromosome is missing by adding a sequential index column.
-    d$index=NA
-    ind = 0
-    for (i in unique(d$CHR)){
-        ind = ind + 1
-        d[d$CHR==i,]$index = ind
-    }
+   # d$index=NA
+   # ind = 0
+   # for (i in unique(d$CHR)){
+   #     ind = ind + 1
+   #     d[d$CHR==i,]$index = ind
+   # }
+   d$index = rep.int(seq_along(unique(d$CHR)), times = tapply(d$SNP,d$CHR,length))  # replcace the for loop of line 92-96 to improve efficiency
     
     # This section sets up positions and ticks. Ticks should be placed in the
     # middle of a chromosome. The a new pos column is added that keeps a running
@@ -107,9 +111,9 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
         #options(scipen=999)
 	    #d$pos=d$BP/1e6
         d$pos=d$BP
-        ticks=floor(length(d$pos))/2+1
+      #  ticks=floor(length(d$pos))/2+1          ## unused, from code line: 169
         xlabel = paste('Chromosome',unique(d$CHR),'position')
-        labs = ticks
+      #  labs = ticks          ## unused, from code line: 169
     } else { ## For multiple chromosomes
         lastbase=0
         ticks=NULL
@@ -117,14 +121,20 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
             if (i==1) {
                 d[d$index==i, ]$pos=d[d$index==i, ]$BP
             } else {
-                lastbase=lastbase+tail(subset(d,index==i-1)$BP, 1)
-                d[d$index==i, ]$pos=d[d$index==i, ]$BP+lastbase
+		## chromosome position maybe not start at 1, eg. 9999. So gaps may be produced. 
+		lastbase = lastbase +max(d[d$index==(i-1),"BP"])   # replace line 128
+		d[d$index == i,"BP"] = d[d$index == i,"BP"]-min(d[d$index==i,"BP"]) +1
+		d[d$index == i, "pos"] = d[d$index == i,"BP"] + lastbase    # replace line 129
+                # lastbase=lastbase+tail(subset(d,index==i-1)$BP, 1)
+                # d[d$index==i, ]$pos=d[d$index==i, ]$BP+lastbase
+		   
             }
             # Old way: assumes SNPs evenly distributed
             # ticks=c(ticks, d[d$index==i, ]$pos[floor(length(d[d$index==i, ]$pos)/2)+1])
             # New way: doesn't make that assumption
-            ticks = c(ticks, (min(d[d$index == i,]$pos) + max(d[d$index == i,]$pos))/2 + 1)
+           # ticks = c(ticks, (min(d[d$index == i,]$pos) + max(d[d$index == i,]$pos))/2 + 1)  # see line 136, to reduce the burden of for loop 
         }
+	ticks <-tapply(d$pos,d$index,quantile,probs=0.5)   # replace line 135
         xlabel = 'Chromosome'
         #labs = append(unique(d$CHR),'') ## I forgot what this was here for... if seems to work, remove.
         labs <- unique(d$CHR)
@@ -173,7 +183,8 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     }
     
     # Create a vector of alternatiting colors
-    col=rep(col, max(d$CHR))
+    #col=rep(col, max(d$CHR))  # replaced by line 187
+    col = rep_len(col, max(d$index))  ## mean this one?  the results are same
 
     # Add points to the plot
     if (nchr==1) {
@@ -182,7 +193,8 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
         # if multiple chromosomes, need to alternate colors and increase the color index (icol) each chr.
         icol=1
         for (i in unique(d$index)) {
-            with(d[d$index==unique(d$index)[i], ], points(pos, logp, col=col[icol], pch=20, ...))
+            #with(d[d$index==unique(d$index)[i], ], points(pos, logp, col=col[icol], pch=20, ...))
+	    points(d[d$index==i,"pos"], d[d$index==i,"logp"], col=col[icol], pch=20, ...)
             icol=icol+1
         }
     }
