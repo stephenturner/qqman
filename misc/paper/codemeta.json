@@ -1,0 +1,17 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+
+  ],
+  "identifier": "",
+  "codeRepository": "https://github.com/stephenturner/qqman",
+  "datePublished": "2018-04-25",
+  "dateModified": "2018-04-25",
+  "dateCreated": "2018-04-25",
+  "description": "An R package for creating Q-Q and manhattan plots from GWAS results",
+  "keywords": "r, gwas, genetic epidemiology, manhattan plot",
+  "license": "GPL v3.0",
+  "title": "qqman",
+  "version": "v0.1.6"
+}
