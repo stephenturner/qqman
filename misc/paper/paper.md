@@ -26,6 +26,6 @@ One of the most commonly used software packages for manipulating and analyzing G
 
 These graphics can be created in other software, such as the standalone desktop software Haploview (@barrett2004haploview), or for focused regions using the web-based application LocusZoom (@pruim2010locuszoom). Conversely, `qqman` is distributed as an R package with no other dependencies that can be easily integrated into existing R-based scripted workflows to further enable automated reproducible research. Furthermore, users can take advantage of R's very granular control of graphical output, enabling a high degree of customizability in creating high-resolution, publication-ready figures. The `qqman` package ships with example data and a detailed vignette illustrating its usage and further features not described here. The package is available on GitHub under the GNU General Public License at <https://github.com/stephenturner/qqman> and on the Comprehensive R Archive Network (CRAN) at <https://cran.r-project.org/package=qqman>.
 
-![Manhattan plot highlighting SNPs of interest on chromosome 3, with Q-Q plot showing substantial deviation from the diagonal (inset).](fig1.jpg)
+![Manhattan plot highlighting SNPs of interest on chromosome 3, with Q-Q plot showing substantial deviation from the diagonal (inset).](fig1.png)
 
 # References
