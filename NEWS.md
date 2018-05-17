@@ -1,3 +1,8 @@
+# qqman 0.1.6
+
+* Added "URL" and "BugReports" fields to description.
+* Updated vignette.
+
 # qqman 0.1.5
 
 * Optimizations thanks to [XikunHan](https://github.com/XikunHan).
