@@ -8,7 +8,11 @@
 
 ## Citation
 
-If you'd like to cite qqman (appreciated but not required), please cite the pre-print below:
+If you'd like to cite qqman (appreciated but not required), please cite the publication below:
+
+Turner, (2018). qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. _Journal of Open Source Software_, 3(25), 731, https://doi.org/10.21105/joss.00731
+
+More details are found in the preprint:
 
 Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. [*biorXiv* DOI: 10.1101/005165](http://biorxiv.org/content/early/2014/05/14/005165).
 
