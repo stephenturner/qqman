@@ -2,14 +2,14 @@ bibentry(bibtype = "Article",
   title        = "qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots",
   author       = c(person(given = "Stephen",
                           family = "Turner")),
-  journal      = "bioRxiv",
-  year         = "2014",
-  doi          = "10.1101/005165",
+  journal      = "The Journal of Open Source Software",
+  year         = "2018",
+  doi          = "10.21105/joss.00731",
 
   header       = "To cite qqman in publications use:",
   textVersion  =
-  paste("Stephen D. Turner (2014).",
+  paste("Stephen D. Turner (2018).",
         "qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots.",
-        "bioRxiv",
-        "doi:10.1101/005165")
+        "Journal of Open Source Software, 3(25), 731",
+        "doi:10.21105/joss.00731")
 )
