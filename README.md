@@ -2,6 +2,8 @@
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/qqman)](http://cran.r-project.org/package=qqman)
 
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.00731/status.svg)](https://doi.org/10.21105/joss.00731)
+
 ![qqman.gif](tools/qqman.gif)
 
 ## Citation
