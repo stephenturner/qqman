@@ -45,9 +45,9 @@ useful to plot raw p-values, but plotting the raw value could be useful for
 other genome-wide plots, for example, peak heights, bayes factors, test 
 statistics, other "scores," etc.}
 
-\item{annotatePval}{If set, SNPs below this p-value will be annotated on the plot.}
+\item{annotatePval}{If set, SNPs below this p-value will be annotated on the plot. If logp is FALSE, SNPs above the specified value will be annotated.}
 
-\item{annotateTop}{If TRUE, only annotates the top hit on each chromosome that is below the annotatePval threshold.}
+\item{annotateTop}{If TRUE, only annotates the top hit on each chromosome that is below the annotatePval threshold (or above if logp is FALSE).}
 
 \item{...}{Arguments passed on to other plot/points functions}
 }

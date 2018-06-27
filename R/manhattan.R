@@ -26,8 +26,8 @@
 #'   useful to plot raw p-values, but plotting the raw value could be useful for
 #'   other genome-wide plots, for example, peak heights, bayes factors, test 
 #'   statistics, other "scores," etc.
-#' @param annotatePval If set, SNPs below this p-value will be annotated on the plot.
-#' @param annotateTop If TRUE, only annotates the top hit on each chromosome that is below the annotatePval threshold. 
+#' @param annotatePval If set, SNPs below this p-value will be annotated on the plot. If logp is FALSE, SNPs above the specified value will be annotated.
+#' @param annotateTop If TRUE, only annotates the top hit on each chromosome that is below the annotatePval threshold (or above if logp is FALSE). 
 #' @param ... Arguments passed on to other plot/points functions
 #'   
 #' @return A manhattan plot.
@@ -214,12 +214,19 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # Highlight top SNPs
     if (!is.null(annotatePval)) {
         # extract top SNPs at given p-val
-        topHits = subset(d, P <= annotatePval)
+        if (logp) {
+            topHits = subset(d, P <= annotatePval)
+        } else
+            topHits = subset(d, P >= annotatePval)
         par(xpd = TRUE)
         # annotate these SNPs
         if (annotateTop == FALSE) {
-            with(subset(d, P <= annotatePval), 
-                 textxy(pos, -log10(P), offset = 0.625, labs = topHits$SNP, cex = 0.45), ...)
+          if (logp) {
+              with(subset(d, P <= annotatePval), 
+                   textxy(pos, -log10(P), offset = 0.625, labs = topHits$SNP, cex = 0.45), ...)
+          } else
+              with(subset(d, P >= annotatePval), 
+                   textxy(pos, P, offset = 0.625, labs = topHits$SNP, cex = 0.45), ...)
         }
         else {
             # could try alternative, annotate top SNP of each sig chr
@@ -232,7 +239,10 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
                 topSNPs <- rbind(topSNPs, chrSNPs[1,])
                 
             }
-            textxy(topSNPs$pos, -log10(topSNPs$P), offset = 0.625, labs = topSNPs$SNP, cex = 0.5, ...)
+            if (logp ){
+                textxy(topSNPs$pos, -log10(topSNPs$P), offset = 0.625, labs = topSNPs$SNP, cex = 0.5, ...)
+            } else
+              textxy(topSNPs$pos, topSNPs$P, offset = 0.625, labs = topSNPs$SNP, cex = 0.5, ...)
         }
     }  
     par(xpd = FALSE)
