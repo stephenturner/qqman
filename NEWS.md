@@ -1,3 +1,7 @@
+# qqman 0.1.7
+
+* When `logp=FALSE`, SNPs can be annotated if their value from the P column is above the threshold given by `annotatePval`, and not below.
+
 # qqman 0.1.6
 
 * Added "URL" and "BugReports" fields to description.
