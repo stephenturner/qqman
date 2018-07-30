@@ -51,7 +51,8 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
 manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
                       col=c("gray10", "gray60"), chrlabs=NULL,
                       suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8),
-                      highlight=NULL, logp=TRUE, annotatePval = NULL, annotateTop = TRUE, ...) {
+                      highlight=NULL, logp=TRUE, annotatePval = NULL, annotateTop = TRUE,
+                      cex.annot = 0.5, ...) {
 
   # Check for sensible dataset
   ## Make sure you have chr, bp and p columns.
@@ -157,7 +158,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
   col = rep_len(col, length(unique(d$CHR))) %>% setNames(unique(d$CHR))
 
   # Add points to the plot
-  with(d, points(pos, logp, col = col[CHR], pch = 20, ...))
+  with(d, points(pos, logp, col = col[as.character(CHR)], pch = 20, ...))
 
   # Add suggestive and genomewide lines
   if (suggestiveline) abline(h = suggestiveline, col = "blue")
@@ -192,7 +193,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     }
     # annotate these SNPs
     par(xpd = TRUE)
-    with(topHits, textxy(pos, logp, offset = 0.625, labs = SNP, cex = 0.5, ...))
+    with(topHits, textxy(pos, logp, offset = 0.625, labs = SNP, cex = cex.annot, ...))
     par(xpd = FALSE)
   }
 }
