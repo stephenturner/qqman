@@ -7,7 +7,7 @@ Description: Create Q-Q and manhattan plots for GWAS data from PLINK results.
 Depends:
     R (>= 3.0.0),
 Imports:
-    calibrate
+    calibrate, dplyr, rlang, magrittr
 Suggests:
     knitr
 License: GPL-3
