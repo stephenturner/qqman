@@ -30,6 +30,7 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
 #'   statistics, other "scores," etc.
 #' @param annotatePval If set, SNPs below this p-value will be annotated on the plot. If logp is FALSE, SNPs above the specified value will be annotated.
 #' @param annotateTop If TRUE, only annotates the top hit on each chromosome that is below the annotatePval threshold (or above if logp is FALSE).
+#' @param cex.annot Annotation size factor
 #' @param ... Arguments passed on to other plot/points functions
 #'
 #' @return A manhattan plot.
@@ -48,10 +49,10 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
 #' @importFrom rlang .data
 #'
 #' @export
-manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
-                      col=c("gray10", "gray60"), chrlabs=NULL,
-                      suggestiveline=-log10(1e-5), genomewideline=-log10(5e-8),
-                      highlight=NULL, logp=TRUE, annotatePval = NULL, annotateTop = TRUE,
+manhattan <- function(x, chr = "CHR", bp = "BP", p = "P", snp = "SNP",
+                      col = c("gray10", "gray60"), chrlabs = NULL,
+                      suggestiveline = -log10(1e-5), genomewideline = -log10(5e-8),
+                      highlight = NULL, logp = TRUE, annotatePval = NULL, annotateTop = TRUE,
                       cex.annot = 0.5, ...) {
 
   # Check for sensible dataset
@@ -95,7 +96,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     options(scipen = 999)
     d$pos = d$BP / 1e6
     #d$pos=d$BP
-    xlabel = paste('Chromosome',unique(d$CHR),'position (Mb)')
+    xlabel = sprintf('Chromosome %s position (Mb)', unique(d$CHR))
   } else { ## For multiple chromosomes
     chr_offsets <- d %>%
       group_by(.data$CHR) %>%
@@ -125,7 +126,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
   ## See http://stackoverflow.com/q/23922130/654296
   ## First, define your default arguments
   def_args <- list(xaxt = 'n', bty = 'n', xaxs = 'i', yaxs = 'i', las = 1, pch = 20,
-                   xlim = c(xmin, xmax), ylim = c(0,ceiling(max(d$logp))),
+                   xlim = c(xmin, xmax), ylim = c(0, ceiling(max(d$logp))),
                    xlab = xlabel, ylab = expression(-log[10](italic(p))))
   ## Next, get a list of ... arguments
   #dotargs <- as.list(match.call())[-1L]
@@ -176,8 +177,9 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
     # extract top SNPs at given p-val
     if (logp) {
       topHits = filter(d, .data$P <= annotatePval)
-    } else
+    } else {
       topHits = filter(d, .data$P >= annotatePval)
+    }
 
     if (annotateTop) {
       topHits <- topHits %>%
