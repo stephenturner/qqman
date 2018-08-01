@@ -181,7 +181,7 @@ manhattan <- function(x, chr = "CHR", bp = "BP", p = "P", snp = "SNP",
       topHits = filter(d, .data$P >= annotatePval)
     }
 
-    if (annotateTop) {
+    if (annotateTop && nrow(topHits) > 0) {
       topHits <- topHits %>%
         group_by(.data$CHR) %>%
         {
