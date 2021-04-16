@@ -1,7 +1,7 @@
 ## Test environments
 
-- local OS X install, R 3.3.2
-- win-builder (devel and release)
+- local OS X install, R 4.0.4
+- `devtools::check_rhub()`
 
 ## R CMD check results
 

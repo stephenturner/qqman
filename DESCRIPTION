@@ -1,6 +1,6 @@
 Package: qqman
 Title: Q-Q and Manhattan Plots for GWAS Data
-Version: 0.1.7
+Version: 0.1.8
 Author: Stephen Turner <vustephen@gmail.com>
 Maintainer: Stephen Turner <vustephen@gmail.com>
 Description: Create Q-Q and manhattan plots for GWAS data from PLINK results.
@@ -9,10 +9,11 @@ Depends:
 Imports:
     calibrate
 Suggests:
-    knitr
+    knitr,
+    rmarkdown
 License: GPL-3
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1
 URL: https://github.com/stephenturner/qqman
 BugReports: https://github.com/stephenturner/qqman/issues

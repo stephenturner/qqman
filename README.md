@@ -1,8 +1,8 @@
 # qqman: An R package for creating Q-Q and manhattan plots from GWAS results.
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/qqman)](http://cran.r-project.org/package=qqman)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/qqman)](https://cran.r-project.org/package=qqman)
 
-[![DOI](http://joss.theoj.org/papers/10.21105/joss.00731/status.svg)](https://doi.org/10.21105/joss.00731)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.00731/status.svg)](https://doi.org/10.21105/joss.00731)
 
 ![qqman.gif](tools/qqman.gif)
 
@@ -14,7 +14,7 @@ Turner, (2018). qqman: an R package for visualizing GWAS results using Q-Q and m
 
 More details are found in the preprint:
 
-Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. [*biorXiv* DOI: 10.1101/005165](http://biorxiv.org/content/early/2014/05/14/005165).
+Turner, S.D. qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. [*biorXiv* DOI: 10.1101/005165](https://biorxiv.org/content/early/2014/05/14/005165).
 
 ## Installation
 
@@ -46,7 +46,7 @@ library(qqman)
 
 ## Usage
 
-See the [online package vignette](http://cran.r-project.org/web/packages/qqman/vignettes/qqman.html) for more examples:
+See the [online package vignette](https://cran.r-project.org/web/packages/qqman/vignettes/qqman.html) for more examples:
 
 ```coffee
 vignette("manhattan")
