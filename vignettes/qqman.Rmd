@@ -137,7 +137,7 @@ Creating Q-Q plots is straightforward - simply supply a vector of p-values to th
 qq(gwasResults$P)
 ```
 
-We can otionally supply many other graphical parameters.
+We can optionally supply many other graphical parameters.
 
 ```{r}
 qq(gwasResults$P, main="Q-Q plot of GWAS p-values",
