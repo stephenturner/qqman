@@ -1,3 +1,7 @@
+# qqman 0.1.9
+
+* Fix package level documentation.
+
 # qqman 0.1.8
 
 * Add `rmarkdown` to Suggests.
