@@ -5,3 +5,4 @@ misc/
 assets/
 cran-comments.md
 ^doc$
+^CRAN-SUBMISSION$

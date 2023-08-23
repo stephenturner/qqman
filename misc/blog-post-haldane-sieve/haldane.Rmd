@@ -67,7 +67,7 @@ Finally, creating Q-Q plots is straightforward - simply supply a vector of p-val
 qq(gwasResults$P, main="Q-Q plot of GWAS p-values")
 ```
 
-Read the [blog post](http://gettinggeneticsdone.blogspot.com/2014/05/qqman-r-package-for-qq-and-manhattan-plots-for-gwas-results.html) or check out the [package vignette](http://cran.r-project.org/web/packages/qqman/vignettes/qqman.html) for more examples and options.
+Read the [blog post](http://gettinggeneticsdone.blogspot.com/2014/05/qqman-r-package-for-qq-and-manhattan-plots-for-gwas-results.html) or check out the [package vignette](https://cran.r-project.org/package=qqman/vignettes/qqman.html) for more examples and options.
 
 ```{r}
 vignette("qqman")
