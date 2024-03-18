@@ -95,7 +95,7 @@ manhattan <- function(x, chr="CHR", bp="BP", p="P", snp="SNP",
    #     ind = ind + 1
    #     d[d$CHR==i,]$index = ind
    # }
-   d$index = rep.int(seq_along(unique(d$CHR)), times = tapply(d$SNP,d$CHR,length))  # replcace the for loop of line 92-96 to improve efficiency
+   d$index = rep.int(seq_along(unique(d$CHR)), times = tapply(d$BP,d$CHR,length))  # replcace the for loop of line 92-96 to improve efficiency
     
     # This section sets up positions and ticks. Ticks should be placed in the
     # middle of a chromosome. The a new pos column is added that keeps a running
