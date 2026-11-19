@@ -6,6 +6,10 @@
 
 ![qqman.gif](tools/qqman.gif)
 
+## Web app
+
+Don't use R? Make Manhattan and Q-Q plots in your browser at **[qqman.stephenturner.us](https://qqman.stephenturner.us)**. Upload or paste PLINK, REGENIE, SAIGE or any other delimited results file (gzipped is fine), check your data, adjust colors, labels and highlighting, and export PNG or SVG. Everything runs locally, so your data never leaves your computer. The app also shows the equivalent qqman R code for the plot you made. Source is in [`web/`](web/).
+
 ## Citation
 
 If you'd like to cite qqman (appreciated but not required), please cite the publication below:

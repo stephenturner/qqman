@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qqman · Manhattan and Q-Q plots in your browser</title>
+<meta name="description" content="Make Manhattan and Q-Q plots from GWAS results in your browser. Upload or paste PLINK, REGENIE, SAIGE, BOLT-LMM or any delimited file. Your data never leaves your computer.">
+<meta name="theme-color" content="#0f172a">
+<meta property="og:title" content="qqman: Manhattan and Q-Q plots in your browser">
+<meta property="og:description" content="Upload or paste GWAS results and get publication-ready Manhattan and Q-Q plots. Nothing is uploaded anywhere.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://qqman.stephenturner.us/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  try { const t = localStorage.getItem('qqman-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="qqman home">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><use href="#logo"/></svg>
+    <span class="brand-name">qqman</span>
+  </a>
+  <p class="tagline">Manhattan and Q-Q plots for GWAS results, in your browser. Made with ❤️ by <a href="https://stephenturner.us" target="_blank" rel="noopener">Stephen Turner.</a></p>
+  <nav class="topnav">
+    <a class="gh-link" href="https://github.com/stephenturner/qqman" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>stephenturner/qqman</span>
+    </a>
+    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.5 14.6A8.5 8.5 0 019.4 3.5a8.5 8.5 0 1011.1 11.1z"/></svg>
+    </button>
+  </nav>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="7" fill="#0f172a"/>
+    <g fill="#94a3b8"><circle cx="6" cy="24" r="1.6"/><circle cx="9" cy="22" r="1.6"/><circle cx="15" cy="24" r="1.6"/><circle cx="21" cy="23" r="1.6"/><circle cx="27" cy="24" r="1.6"/></g>
+    <g fill="#e2e8f0"><circle cx="12" cy="23" r="1.6"/><circle cx="18" cy="21" r="1.6"/><circle cx="24" cy="22" r="1.6"/></g>
+    <g fill="#38bdf8"><circle cx="18" cy="16" r="1.7"/><circle cx="18" cy="11" r="1.8"/><circle cx="18" cy="6.2" r="1.9"/></g>
+    <path d="M4 13.5h24" stroke="#f87171" stroke-width="1.2" stroke-dasharray="2 1.6"/>
+  </symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Data and plot settings">
+
+    <section class="card" id="sec-data">
+      <h2><span class="step">1</span>Data</h2>
+      <label id="dropzone" class="dropzone" tabindex="0">
+        <input type="file" id="file-input" class="visually-hidden" accept=".txt,.tsv,.csv,.tab,.gz,.assoc,.qassoc,.linear,.logistic,.glm,.regenie,.mlma,.ma,.sumstats,.dat,text/plain,text/csv,text/tab-separated-values,application/gzip">
+        <svg viewBox="0 0 24 24" class="dz-icon" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+        <span class="dz-main"><strong>Drop a results file</strong> or <span class="link">browse</span></span>
+        <span class="dz-sub">Text, CSV, TSV, PLINK, REGENIE, SAIGE… also <code>.gz</code></span>
+      </label>
+      <button id="paste-btn" class="btn btn-ghost btn-block" type="button" aria-expanded="false" aria-controls="paste-box">Paste data instead</button>
+      <div id="paste-box" class="paste-box" hidden>
+        <textarea id="paste-text" spellcheck="false" placeholder="SNP&#9;CHR&#9;BP&#9;P&#10;rs1&#9;1&#9;1&#9;0.9148&#10;rs2&#9;1&#9;2&#9;0.9371&#10;…" aria-label="Paste data"></textarea>
+        <div class="row">
+          <button id="paste-go" class="btn btn-primary" type="button">Plot pasted data</button>
+          <span class="hint">Tabs, commas or spaces</span>
+        </div>
+      </div>
+      <div class="examples">
+        <div class="label-sm">Or try an example</div>
+        <button class="example" type="button" data-example="gwasResults"><b>gwasResults</b><span>16,470 SNPs, the qqman example data</span></button>
+        <button class="example" type="button" data-example="big"><b>Simulated GWAS</b><span>1,000,000 SNPs, 15 loci, chr X</span></button>
+        <button class="example" type="button" data-example="messy"><b>Messy file</b><span>NAs, chr prefixes, bad p-values</span></button>
+      </div>
+      <div id="progress" class="progress" hidden><div class="progress-bar"><i></i></div><span class="progress-text">Reading…</span></div>
+      <div id="file-info" class="file-info" hidden></div>
+      <p class="privacy"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.9-4.9 1.4 1.4-6.3 6.3z"/></svg>Your data stays on your computer. Nothing is uploaded.</p>
+    </section>
+
+    <section class="card" id="sec-cols" aria-disabled="true">
+      <h2><span class="step">2</span>Columns</h2>
+      <div class="field-grid">
+        <label for="col-chr">Chromosome</label><select id="col-chr" data-map="chr"></select>
+        <label for="col-bp">Position</label><select id="col-bp" data-map="bp"></select>
+        <label for="col-p">P-value</label><select id="col-p" data-map="p"></select>
+        <label for="col-snp">SNP name</label><select id="col-snp" data-map="snp"></select>
+        <label for="col-scale">P scale</label>
+        <select id="col-scale" data-map="scale">
+          <option value="p">p-value (plot −log10 p)</option>
+          <option value="mlog10">already −log10(p)</option>
+          <option value="raw">raw value (no transform)</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card" id="sec-opts">
+      <div class="card-head">
+        <h2><span class="step">3</span>Options</h2>
+        <button id="reset-opts" class="btn btn-text" type="button" title="Restore all options to their defaults">Reset</button>
+      </div>
+
+      <details class="group" open>
+        <summary>Points and colors</summary>
+        <div class="group-body">
+          <div class="field">
+            <label for="palette">Chromosome colors</label>
+            <select id="palette">
+              <option value="qqman">qqman (gray10, gray60)</option>
+              <option value="slate">Slate and sky</option>
+              <option value="navy">Navy and orange</option>
+              <option value="okabe">Okabe-Ito (colorblind safe)</option>
+              <option value="viridis">Viridis</option>
+              <option value="rainbow">Rainbow</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="swatches" id="swatches" aria-label="Chromosome colors, cycled across chromosomes"></div>
+          <div class="field">
+            <label for="opt-pointSize">Point size <output data-for="pointSize"></output></label>
+            <input type="range" id="opt-pointSize" data-opt="pointSize" min="1" max="12" step="0.5">
+          </div>
+          <div class="field">
+            <label for="opt-opacity">Opacity <output data-for="opacity"></output></label>
+            <input type="range" id="opt-opacity" data-opt="opacity" min="0.1" max="1" step="0.05">
+          </div>
+          <div class="field">
+            <label for="opt-chrGap">Gap between chromosomes <output data-for="chrGap"></output></label>
+            <input type="range" id="opt-chrGap" data-opt="chrGap" min="0" max="0.03" step="0.001">
+          </div>
+          <label class="check"><input type="checkbox" data-opt="shade"> Shade alternate chromosomes</label>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Significance lines</summary>
+        <div class="group-body">
+          <div class="line-row">
+            <label class="check"><input type="checkbox" data-opt="suggestive.on"> Suggestive</label>
+            <input type="text" inputmode="decimal" id="thr-sugg" data-opt="suggestive.p" aria-label="Suggestive threshold" class="num-in">
+            <input type="color" data-opt="suggestive.color" aria-label="Suggestive line color">
+          </div>
+          <div class="line-row">
+            <label class="check"><input type="checkbox" data-opt="genomewide.on"> Genome-wide</label>
+            <input type="text" inputmode="decimal" id="thr-gw" data-opt="genomewide.p" aria-label="Genome-wide threshold" class="num-in">
+            <input type="color" data-opt="genomewide.color" aria-label="Genome-wide line color">
+          </div>
+          <p class="hint" id="line-hint">Thresholds are p-values. Lines are drawn at −log10(p).</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="opt-lineStyle">Style</label>
+              <select id="opt-lineStyle" data-opt="lineStyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
+            </div>
+            <div class="field">
+              <label for="opt-lineWidth">Width</label>
+              <input type="number" id="opt-lineWidth" data-opt="lineWidth" min="0.25" max="6" step="0.25">
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Highlight SNPs</summary>
+        <div class="group-body">
+          <label for="opt-highlight" class="label-sm">SNP names to highlight, separated by spaces, commas or new lines</label>
+          <textarea id="opt-highlight" data-opt="highlightText" rows="3" spellcheck="false" placeholder="rs3001 rs3002 rs3003"></textarea>
+          <div class="row between">
+            <span id="highlight-status" class="hint"></span>
+            <button id="use-soi" class="btn btn-text" type="button" hidden>Use snpsOfInterest</button>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="opt-highlightColor">Color</label><input type="color" id="opt-highlightColor" data-opt="highlightColor"></div>
+            <div class="field"><label for="opt-highlightScale">Size ×</label><input type="number" id="opt-highlightScale" data-opt="highlightScale" min="0.5" max="4" step="0.25"></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Annotate</summary>
+        <div class="group-body">
+          <div class="line-row">
+            <label class="check"><input type="checkbox" data-opt="annotate"> <span id="annot-label">Label SNPs with p &lt;</span></label>
+            <input type="text" inputmode="decimal" id="thr-annot" data-opt="annotateP" aria-label="Annotation threshold" class="num-in">
+          </div>
+          <label class="check"><input type="checkbox" data-opt="annotateTop"> Only the top SNP per chromosome</label>
+          <div class="field-row">
+            <div class="field">
+              <label for="opt-labelCol">Label with</label>
+              <select id="opt-labelCol" data-opt="labelCol"></select>
+            </div>
+            <div class="field">
+              <label for="opt-labelSize">Text size</label>
+              <input type="number" id="opt-labelSize" data-opt="labelSize" min="5" max="28" step="0.5">
+            </div>
+          </div>
+          <p class="hint">Click any point on the Manhattan plot to add or remove its label.</p>
+          <button id="clear-pins" class="btn btn-text" type="button" hidden>Clear clicked labels</button>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Axes and text</summary>
+        <div class="group-body">
+          <div class="field"><label for="opt-title">Title</label><input type="text" id="opt-title" data-opt="title" placeholder="None"></div>
+          <div class="field"><label for="opt-xlab">X axis label</label><input type="text" id="opt-xlab" data-opt="xlab"></div>
+          <div class="field"><label for="opt-ylab">Y axis label</label><input type="text" id="opt-ylab" data-opt="ylab"></div>
+          <p class="hint">Leave blank for the default. <code>_{10}</code> makes a subscript, <code>*p*</code> italics.</p>
+          <div class="field-row">
+            <div class="field"><label for="opt-yMax">Y axis max</label><input type="text" inputmode="decimal" id="opt-yMax" data-opt="yMax" placeholder="Auto"></div>
+            <div class="field"><label for="opt-fontSize">Font size</label><input type="number" id="opt-fontSize" data-opt="fontSize" min="6" max="32" step="0.5"></div>
+          </div>
+          <div class="field">
+            <label for="opt-fontFamily">Font</label>
+            <select id="opt-fontFamily" data-opt="fontFamily"><option value="sans">Helvetica / Arial</option><option value="serif">Times</option><option value="mono">Monospace</option></select>
+          </div>
+          <div class="field">
+            <label for="opt-chrLabels">Chromosome labels</label>
+            <input type="text" id="opt-chrLabels" data-opt="chrLabels" placeholder="Auto, or e.g. 1, 2, …, 22, X">
+            <span id="chrlabels-status" class="hint"></span>
+          </div>
+          <label class="check"><input type="checkbox" data-opt="plinkNames"> Show 23, 24, 25, 26 as X, Y, XY, MT</label>
+          <label class="check"><input type="checkbox" data-opt="grid"> Horizontal grid lines</label>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Size and margins</summary>
+        <div class="group-body">
+          <div class="field-row">
+            <div class="field"><label for="opt-width">Width (px)</label><input type="number" id="opt-width" data-opt="width" min="200" max="6000" step="10"></div>
+            <div class="field"><label for="opt-height">Height (px)</label><input type="number" id="opt-height" data-opt="height" min="150" max="4000" step="10"></div>
+          </div>
+          <div class="label-sm">Margins (px)</div>
+          <div class="margins">
+            <label>Top<input type="number" data-opt="margin.t" min="0" max="400"></label>
+            <label>Right<input type="number" data-opt="margin.r" min="0" max="400"></label>
+            <label>Bottom<input type="number" data-opt="margin.b" min="0" max="400"></label>
+            <label>Left<input type="number" data-opt="margin.l" min="0" max="400"></label>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="opt-bg">Background</label><input type="color" id="opt-bg" data-opt="bg"></div>
+            <label class="check self-end"><input type="checkbox" data-opt="transparent"> Transparent</label>
+          </div>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Q-Q plot</summary>
+        <div class="group-body">
+          <div class="field-row">
+            <div class="field"><label for="opt-qq-color">Points</label><input type="color" id="opt-qq-color" data-opt="qq.color"></div>
+            <div class="field"><label for="opt-qq-lineColor">Diagonal</label><input type="color" id="opt-qq-lineColor" data-opt="qq.lineColor"></div>
+            <div class="field"><label for="opt-qq-ciColor">Band</label><input type="color" id="opt-qq-ciColor" data-opt="qq.ciColor"></div>
+          </div>
+          <label class="check"><input type="checkbox" data-opt="qq.ci"> 95% confidence band</label>
+          <label class="check"><input type="checkbox" data-opt="qq.showLambda"> Show genomic inflation (λ<sub>GC</sub>)</label>
+          <label class="check"><input type="checkbox" data-opt="qq.highlight"> Show highlighted SNPs</label>
+          <div class="field"><label for="opt-qq-title">Title</label><input type="text" id="opt-qq-title" data-opt="qq.title" placeholder="None"></div>
+          <div class="field"><label for="opt-qq-xlab">X axis label</label><input type="text" id="opt-qq-xlab" data-opt="qq.xlab" placeholder="Expected −log₁₀(p)"></div>
+          <div class="field"><label for="opt-qq-ylab">Y axis label</label><input type="text" id="opt-qq-ylab" data-opt="qq.ylab" placeholder="Observed −log₁₀(p)"></div>
+          <div class="field-row">
+            <div class="field"><label for="opt-qq-width">Width (px)</label><input type="number" id="opt-qq-width" data-opt="qq.width" min="150" max="4000" step="10"></div>
+            <div class="field"><label for="opt-qq-height">Height (px)</label><input type="number" id="opt-qq-height" data-opt="qq.height" min="150" max="4000" step="10"></div>
+          </div>
+          <p class="hint">Fonts, point size and margins are shared with the Manhattan plot.</p>
+        </div>
+      </details>
+    </section>
+  </aside>
+
+  <main class="main" id="main">
+    <section id="empty" class="empty">
+      <div class="empty-inner">
+        <svg class="hero-plot" viewBox="0 0 600 220" aria-hidden="true" id="hero-plot"></svg>
+        <h1>Manhattan and Q-Q plots, straight from your results file</h1>
+        <p class="lede">Drop in output from PLINK, REGENIE, SAIGE, BOLT-LMM, METAL or anything with a chromosome, position and p-value column. Millions of rows are fine. Everything runs locally in this tab.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" type="button" data-example="gwasResults">Try the example data</button>
+          <button class="btn btn-ghost btn-lg" type="button" id="hero-browse">Open a file</button>
+        </div>
+        <ul class="features">
+          <li><b>Checks your data first.</b> Missing values, p-values out of range, p = 0, odd chromosome names and more are reported before anything is plotted.</li>
+          <li><b>Interactive.</b> Hover for details, drag to zoom into a region, click points to label them.</li>
+          <li><b>Publication ready.</b> Export high-resolution PNG or editable SVG, and copy the equivalent qqman R code.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="workspace" class="workspace" hidden>
+      <div class="stats" id="stats"></div>
+      <div id="alert" class="alert" hidden></div>
+
+      <div class="tabs" role="tablist" aria-label="Views">
+        <button role="tab" class="tab" data-tab="manhattan" aria-selected="true">Manhattan</button>
+        <button role="tab" class="tab" data-tab="qq" aria-selected="false">Q-Q</button>
+        <button role="tab" class="tab" data-tab="hits" aria-selected="false">Top hits</button>
+        <button role="tab" class="tab" data-tab="checks" aria-selected="false">Data checks <span class="badge" id="checks-badge" hidden></span></button>
+        <button role="tab" class="tab" data-tab="rcode" aria-selected="false">R code</button>
+      </div>
+
+      <div class="panel" data-panel="manhattan" role="tabpanel">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <label class="sr" for="region">Region</label>
+            <select id="region" class="select-sm" aria-label="Region"></select>
+            <button id="zoom-reset" class="btn btn-sm btn-ghost" type="button" hidden>Reset zoom</button>
+            <span class="hint toolbar-hint">Drag to zoom · double-click to reset · click a point to label it</span>
+          </div>
+          <div class="toolbar-right export">
+            <select id="export-scale" class="select-sm" aria-label="PNG resolution" title="PNG resolution">
+              <option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option>
+            </select>
+            <button class="btn btn-sm" type="button" data-export="manhattan:png">PNG</button>
+            <button class="btn btn-sm" type="button" data-export="manhattan:svg">SVG</button>
+          </div>
+        </div>
+        <div class="plot-card">
+          <div class="plot-wrap" id="mh-wrap">
+            <canvas id="mh" role="img" aria-label="Manhattan plot"></canvas>
+            <canvas id="mh-over" class="overlay" aria-hidden="true"></canvas>
+            <div class="tooltip" id="mh-tip" hidden></div>
+          </div>
+        </div>
+        <div class="plot-foot hint" id="mh-foot"></div>
+      </div>
+
+      <div class="panel" data-panel="qq" role="tabpanel" hidden>
+        <div class="toolbar">
+          <div class="toolbar-left"><span class="hint" id="qq-note"></span></div>
+          <div class="toolbar-right export">
+            <select id="export-scale-qq" class="select-sm" aria-label="PNG resolution" title="PNG resolution">
+              <option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option>
+            </select>
+            <button class="btn btn-sm" type="button" data-export="qq:png">PNG</button>
+            <button class="btn btn-sm" type="button" data-export="qq:svg">SVG</button>
+          </div>
+        </div>
+        <div class="plot-card">
+          <div class="plot-wrap" id="qq-wrap">
+            <canvas id="qq" role="img" aria-label="Q-Q plot"></canvas>
+            <canvas id="qq-over" class="overlay" aria-hidden="true"></canvas>
+            <div class="tooltip" id="qq-tip" hidden></div>
+          </div>
+          <div class="qq-off" id="qq-off" hidden>The Q-Q plot needs p-values. Set "P scale" to p-value or −log10(p) to see it.</div>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="hits" role="tabpanel" hidden>
+        <div class="toolbar">
+          <div class="toolbar-left"><span class="hint" id="hits-note"></span></div>
+          <div class="toolbar-right"><button class="btn btn-sm" type="button" id="hits-csv">Download CSV</button></div>
+        </div>
+        <div class="table-wrap"><table class="table" id="hits-table"></table></div>
+      </div>
+
+      <div class="panel" data-panel="checks" role="tabpanel" hidden>
+        <ul class="checks" id="checks"></ul>
+        <h3 class="sub">Data preview</h3>
+        <p class="hint" id="preview-note"></p>
+        <div class="table-wrap"><table class="table" id="preview-table"></table></div>
+      </div>
+
+      <div class="panel" data-panel="rcode" role="tabpanel" hidden>
+        <p class="hint">The closest equivalent using the <a href="https://cran.r-project.org/package=qqman" target="_blank" rel="noopener">qqman R package</a>, updated as you change options.</p>
+        <div class="code-wrap">
+          <button class="btn btn-sm copy" type="button" id="copy-r">Copy</button>
+          <pre><code id="rcode"></code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="footer">
+  <p>Built on <a href="https://github.com/stephenturner/qqman" target="_blank" rel="noopener">qqman</a>, the R package for Q-Q and Manhattan plots. Source, issues and the R package are on <a href="https://github.com/stephenturner/qqman" target="_blank" rel="noopener">GitHub</a>.</p>
+  <p>If qqman helps your work, please cite: Turner, S.D. (2018). qqman: an R package for visualizing GWAS results using Q-Q and manhattan plots. <i>Journal of Open Source Software</i>, 3(25), 731. <a href="https://doi.org/10.21105/joss.00731" target="_blank" rel="noopener">doi:10.21105/joss.00731</a></p>
+</footer>
+
+<div id="drop-overlay" class="drop-overlay" hidden><div>Drop to load</div></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
