@@ -1,3 +1,7 @@
+# qqman 0.1.10
+
+* Fix vignette build failures.
+
 # qqman 0.1.9
 
 * Fix package level documentation.

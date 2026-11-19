@@ -6,3 +6,4 @@ assets/
 cran-comments.md
 ^doc$
 ^CRAN-SUBMISSION$
+web/
