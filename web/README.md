@@ -27,3 +27,5 @@ In the site settings, set the base directory to `web`. There is no build command
 - `js/stats.js`: normal and beta quantiles, ticks, number formatting.
 - `js/rcode.js`: builds the equivalent qqman R call.
 - `examples/`: `gwasResults` and `snpsOfInterest` exported from the R package.
+- `og.png`: 1200×630 social preview image, drawn with the app's own plotting code from the simulated 1M-SNP example. It also works as the GitHub repository's social preview.
+- `favicon.svg`, `apple-touch-icon.png`: icons.
